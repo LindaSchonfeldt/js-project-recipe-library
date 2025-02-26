@@ -18,7 +18,49 @@
   <header>
     <h1>Recipe Library</h1>
   </header>
+
   <main>
+    <section id="filters">
+      <div class="filter-section">
+        <h2>Filter on ingredients</h2>
+        <select
+          class="filter-select"
+          data-filter-type="ingredients"
+        >
+          <option value="all">All Ingredients</option>
+          <option value="5">Under 5 ingredients</option>
+          <option value="10">6-10 ingredients</option>
+          <option value="15">11-15 ingredients</option>
+          <option value="16">Over 16 ingredients</option>
+        </select>
+      </div>
+
+      <div class="filter-section">
+        <h2>Sort on time</h2>
+        <select
+          class="filter-select"
+          data-filter-type="time"
+        >
+          <option value="all">All Times</option>
+          <option value="15">Under 15 min</option>
+          <option value="30">15-30 min</option>
+          <option value="60">30-60 min</option>
+          <option value="61">Over 60 min</option>
+        </select>
+      </div>
+    </section>
+
+    <section id="recipe-section">
+      <div id="messageBox">
+        <h2>Temporary placeholder for filters/sorting options</h2>
+      </div>
+
+      <div id="recipe-grid">
+        <div class="recipe-card">
+
+        </div>
+      </div>
+    </section>
 
   </main>
   <script src="./scripts.js"></script>

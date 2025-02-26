@@ -13,13 +13,14 @@
 /* Overall Grid Layout for the Page */
 body {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);  
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   background: #fafbff;
   padding: 1rem;
 }
 
 header {
+  margin: 2rem 0rem 0rem 0rem;
   grid-column: span 4;
 }
 
@@ -29,68 +30,70 @@ main {
 
 h1 {
   color: #0018a4;
-  font-size: 56px;
+  font-size: 40px;
 }
 
 h2 {
   color: var(--text-color);
-  font-size: 18px;
+  font-size: 16px;
 }
 
-/* Blue and Pink Option styles using Flexbox */
-.blue-option,
-.pink-option {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 16px;
-  border-radius: 50px;
+h3 {
+  color: var(--text-color);
   font-weight: 700;
-  cursor: pointer;
-  border: 1px solid;
+  font-size: 14px;
 }
 
-.blue-option {
-  background-color: #ccffe2;
-  color: #0018a4;
-  border-color: #ccffe2;
+p {
+  color: var(--text-color);
+  font-size: 14px;
+  font-weight: 400;
 }
 
-.blue-option:hover {
-  border-color: #0018a4;
+#filters {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }
 
-.blue-option:active {
-  background-color: #0018a4;
-  color: #fff;
+.filter-section {
+  display: flex;
+  flex-direction: column;
 }
 
-.pink-option {
-  background-color: #ffecea;
-  color: #0018a4;
-  border-color: #ffecea;
+.recipe-section {
+  display: flex;
+  flex-direction: row;
 }
 
-.pink-option:hover {
-  border-color: #0018a4;
+.messageBox {
+  display: flex;
+  flex-direction: column;
+  
 }
 
-.pink-option:active {
-  background-color: #ff6589;
-  color: #fff;
+.recipe-card {
+  width: 300px;
+  padding: 16px 16px 24px 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  border: 1px solid #E9E9E9;
+  background: #FFF;
 }
-
-
-
 
 
 
 
 /* MEDIA QUERIES for enhanced grid layout on larger screens */
 @media (min-width: 768px) {
+  
   body {
     grid-template-columns: repeat(8, 1fr);
-    }
+    padding: 2rem;
+  }
 
   header {
     grid-column: span 8;
@@ -98,12 +101,23 @@ h2 {
 
   main {
     grid-column: span 8;
+  }
+
+  h1 {
+    color: #0018a4;
+    font-size: 56px;
+  }
+
+  h2 {
+    color: var(--text-color);
+    font-size: 18px;
   }
 }
 
 @media (min-width: 1024px) {
   body {
     grid-template-columns: repeat(12, 1fr);
+    padding: 2rem;
   }
 
   header {
@@ -112,5 +126,15 @@ h2 {
 
   main {
     grid-column: span 12;
+  }
+
+  h1 {
+    color: #0018a4;
+    font-size: 56px;
+  }
+
+  h2 {
+    color: var(--text-color);
+    font-size: 18px;
   }
 }
