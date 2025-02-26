@@ -1,0 +1,116 @@
+/* Reset default browser styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: "Futura", sans-serif;
+  --text-color: #000;
+}
+
+/* Overall Grid Layout for the Page */
+body {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);  
+  gap: 1rem;
+  background: #fafbff;
+  padding: 1rem;
+}
+
+header {
+  grid-column: span 4;
+}
+
+main {
+  grid-column: span 4;
+}
+
+h1 {
+  color: #0018a4;
+  font-size: 56px;
+}
+
+h2 {
+  color: var(--text-color);
+  font-size: 18px;
+}
+
+/* Blue and Pink Option styles using Flexbox */
+.blue-option,
+.pink-option {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid;
+}
+
+.blue-option {
+  background-color: #ccffe2;
+  color: #0018a4;
+  border-color: #ccffe2;
+}
+
+.blue-option:hover {
+  border-color: #0018a4;
+}
+
+.blue-option:active {
+  background-color: #0018a4;
+  color: #fff;
+}
+
+.pink-option {
+  background-color: #ffecea;
+  color: #0018a4;
+  border-color: #ffecea;
+}
+
+.pink-option:hover {
+  border-color: #0018a4;
+}
+
+.pink-option:active {
+  background-color: #ff6589;
+  color: #fff;
+}
+
+
+
+
+
+
+
+/* MEDIA QUERIES for enhanced grid layout on larger screens */
+@media (min-width: 768px) {
+  body {
+    grid-template-columns: repeat(8, 1fr);
+    }
+
+  header {
+    grid-column: span 8;
+  }
+
+  main {
+    grid-column: span 8;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    grid-template-columns: repeat(12, 1fr);
+  }
+
+  header {
+    grid-column: span 12;
+  }
+
+  main {
+    grid-column: span 12;
+  }
+}
