@@ -1,0 +1,1 @@
+const messageBox = document.getElementById("message-box")
