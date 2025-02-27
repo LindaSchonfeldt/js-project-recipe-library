@@ -23,54 +23,76 @@
     <section id="filter-section">
       <div class="filters">
         <h2>Filter on ingredients</h2>
-        <div class="custom-select" data-filter-type="ingredients">
+        <div
+          class="custom-select"
+          data-filter-type="ingredients"
+        >
           <div
-            class="select-box"
+            class="select-box blue"
             onclick="toggleDropdown(event)"
           >
             <span class="selected-option">Choose an alternative</span>
             <span class="icon">▼</span>
           </div>
-          <div class="options-container">
+          <div class="options-container blue">
             <div
               class="option"
-              onclick="selectOption('Alternativ 1', event)"
-            >Alternativ 1</div>
+              onclick="selectOption('All ingredients', event)"
+            >All ingredients</div>
             <div
               class="option"
-              onclick="selectOption('Alternativ 2', event)"
-            >Alternativ 2</div>
+              onclick="selectOption('Under 5 ingredients', event)"
+            >Under 5 ingredients</div>
             <div
               class="option"
-              onclick="selectOption('Alternativ 3', event)"
-            >Alternativ 3</div>
+              onclick="selectOption('6-10 ingredients', event)"
+            >6-10 ingredients</div>
+            <div
+              class="option"
+              onclick="selectOption('11-15 ingredients', event)"
+            >11-15 ingredients</div>
+            <div
+              class="option"
+              onclick="selectOption('Over 16 ingredients', event)"
+            >Over 16 ingredients</div>
           </div>
         </div>
       </div>
 
       <div class="filters">
         <h2>Sort on time</h2>
-        <div class="custom-select" data-filter-type="time">
+        <div
+          class="custom-select"
+          data-filter-type="time"
+        >
           <div
-            class="select-box"
+            class="select-box pink"
             onclick="toggleDropdown(event)"
           >
             <span class="selected-option">Choose an alternative</span>
             <span class="icon">▼</span>
           </div>
-          <div class="options-container">
+          <div class="options-container pink">
             <div
               class="option"
-              onclick="selectOption('Alternativ 1', event)"
-            >Alternativ 1</div>
+              onclick="selectOption('All times', event)"
+            >All times</div>
             <div
               class="option"
-              onclick="selectOption('Alternativ 2', event)"
-            >Alternativ 2</div>
+              onclick="selectOption('Under 15 min', event)"
+            >Under 15 min</div>
             <div
               class="option"
-              onclick="selectOption('Alternativ 3', event)"
-            >Alternativ 3</div>
+              onclick="selectOption('15-30 min', event)"
+            >15-30 min</div>
+            <div
+              class="option"
+              onclick="selectOption('30-60 min', event)"
+            >30-60 min</div>
+            <div
+              class="option"
+              onclick="selectOption('Over 60min', event)"
+            >Over 60min</div>
           </div>
         </div>
       </div>

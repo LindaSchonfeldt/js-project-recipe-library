@@ -66,64 +66,78 @@ li {
 
 #filter-section {
   display: flex;
-  flex-direction: row;
-  gap: 1rem;
-}
-
-#filters {
-  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .custom-select {
-    position: relative;
-    width: 200px;
-    cursor: pointer;
+  position: relative;
+  width: 200px;
+  cursor: pointer;
 }
 
 .select-box {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: white;
-    border: 2px solid #333;
-    padding: 10px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #0018A4;
+  padding: 0.5rem;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.select-box.blue {
+  background: #CCFFE2;
+  border: 2px solid #CCFFE2;
+}
+
+.select-box.pink {
+  background: #FFECEA;
+  border: 2px solid #FFECEA;
 }
 
 .select-box:hover {
-    border-color: #007bff;
+  border-color: #0018A4;
 }
 
 .select-box .icon {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .options-container {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: white;
-    border: 2px solid #333;
-    border-top: none;
-    display: none;
-    flex-direction: column;
-    z-index: 10;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  border-top: none;
+  display: none;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.options-container.blue {
+  background: #0018A4;
+  border: 2px solid #333;
+  color: white;
+}
+
+.options-container.pink {
+  background: #FF6589;
+  border: 2px solid #0018A4;
+  color: white;
 }
 
 .option {
-    padding: 10px;
-    transition: background 0.3s ease;
+  padding: 10px;
+  transition: background 0.3s ease;
 }
 
 .option:hover {
-    background: #007bff;
-    color: white;
+  background: #007bff;
 }
 
 .custom-select.active .options-container {
-    display: flex;
+  display: flex;
 }
 
 #recipe-section {
@@ -203,8 +217,9 @@ li {
     font-size: 14px;
   }
 
-  select.filter-select {
-    font-size: medium;
+  #filter-section {
+    flex-direction: row;
+    gap: 1rem;
   }
 
   #recipe-section {
@@ -243,8 +258,9 @@ li {
     font-size: 16px;
   }
 
-  select.filter-select {
-    font-size: medium;
+  #filter-section {
+    flex-direction: row;
+    gap: 1rem;
   }
 
   #recipe-section {
