@@ -23,30 +23,56 @@
     <section id="filter-section">
       <div class="filters">
         <h2>Filter on ingredients</h2>
-        <select
-          class="filter-select"
-          data-filter-type="ingredients"
-        >
-          <option value="all">All Ingredients</option>
-          <option value="5">Under 5 ingredients</option>
-          <option value="10">6-10 ingredients</option>
-          <option value="15">11-15 ingredients</option>
-          <option value="16">Over 16 ingredients</option>
-        </select>
+        <div class="custom-select">
+          <div
+            class="select-box"
+            onclick="toggleDropdown(event)"
+          >
+            <span class="selected-option">Choose an alternative</span>
+            <span class="icon">▼</span>
+          </div>
+          <div class="options-container">
+            <div
+              class="option"
+              onclick="selectOption('Alternativ 1', event)"
+            >Alternativ 1</div>
+            <div
+              class="option"
+              onclick="selectOption('Alternativ 2', event)"
+            >Alternativ 2</div>
+            <div
+              class="option"
+              onclick="selectOption('Alternativ 3', event)"
+            >Alternativ 3</div>
+          </div>
+        </div>
       </div>
 
       <div class="filters">
         <h2>Sort on time</h2>
-        <select
-          class="filter-select"
-          data-filter-type="time"
-        >
-          <option value="all">All Times</option>
-          <option value="15">Under 15 min</option>
-          <option value="30">15-30 min</option>
-          <option value="60">30-60 min</option>
-          <option value="61">Over 60 min</option>
-        </select>
+        <div class="custom-select">
+          <div
+            class="select-box"
+            onclick="toggleDropdown(event)"
+          >
+            <span class="selected-option">Choose an alternative</span>
+            <span class="icon">▼</span>
+          </div>
+          <div class="options-container">
+            <div
+              class="option"
+              onclick="selectOption('Alternativ 1', event)"
+            >Alternativ 1</div>
+            <div
+              class="option"
+              onclick="selectOption('Alternativ 2', event)"
+            >Alternativ 2</div>
+            <div
+              class="option"
+              onclick="selectOption('Alternativ 3', event)"
+            >Alternativ 3</div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -58,15 +84,16 @@
       <div id="recipe-grid">
         <div class="recipe-card">
           <img
-            src="https://via.placeholder.com/400x250.png?text=Recipe+Image"
+            src="./assets/placeholder-image.png"
             alt="Recipe image"
             class="recipe-image"
           />
           <div class="recipe-content">
-            <h2>Temporary placeholder recipe</h2>
+            <h2 id="recipe-title">Temporary placeholder recipe</h2>
+            <hr />
             <p><strong>Cuisine:</strong> American</p>
             <p><strong>Time:</strong> 1h 30min</p>
-
+            <hr />
             <h3>Ingredients</h3>
             <ul>
               <li>6 bone-in chicken breast halves, or 6 chicken thighs and wings, skin-on</li>
@@ -76,6 +103,7 @@
             </ul>
           </div>
         </div>
+      </div>
     </section>
 
   </main>

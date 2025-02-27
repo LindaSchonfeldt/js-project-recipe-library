@@ -16,7 +16,7 @@ body {
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   background: #fafbff;
-  padding: 1rem;
+  padding: 0.5rem 1rem 1rem 1rem;
 }
 
 header {
@@ -35,18 +35,28 @@ h1 {
 
 h2 {
   color: var(--text-color);
-  font-size: 16px;
+  font-size: 14px;
+  margin: 0 0 0.5rem 0;
 }
 
 h3 {
   color: var(--text-color);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 12px;
+  margin: 0 0 0.3rem 0;
 }
 
-p, li {
+hr {
+  color: lightgrey;
+  opacity: 50%;
+  height: 2px;
+  margin: 0.3rem 0 0.5rem 0;
+}
+
+p,
+li {
   color: var(--text-color);
-  font-size: 14px;
+  font-size: 12px;
 }
 
 li {
@@ -64,9 +74,56 @@ li {
   display: flex;
 }
 
-.filter-select {
-  font-family: "Futura", sans-serif;
-  padding: 0.5rem;
+.custom-select {
+    position: relative;
+    width: 200px;
+    cursor: pointer;
+}
+
+.select-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border: 2px solid #333;
+    padding: 10px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.select-box:hover {
+    border-color: #007bff;
+}
+
+.select-box .icon {
+    font-size: 14px;
+}
+
+.options-container {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 2px solid #333;
+    border-top: none;
+    display: none;
+    flex-direction: column;
+    z-index: 10;
+}
+
+.option {
+    padding: 10px;
+    transition: background 0.3s ease;
+}
+
+.option:hover {
+    background: #007bff;
+    color: white;
+}
+
+.custom-select.active .options-container {
+    display: flex;
 }
 
 #recipe-section {
@@ -75,6 +132,12 @@ li {
   align-items: flex-start;
   margin: 1rem 0rem 1rem 0rem;
   gap: 1rem;
+}
+
+.recipe-image {
+  width: 100%;
+  border-radius: 8px;
+  margin: 0 0 0.5rem 0;
 }
 
 #message-box {
@@ -96,7 +159,8 @@ li {
   background-color: #FFF;
   border: 1px solid #E9E9E9;
   border-radius: 16px;
-  width: 60vh;
+  height: auto;
+  width: 50vh;
   padding: 0.8rem;
 }
 
@@ -104,9 +168,6 @@ li {
   border: 2px solid #0018A4;
   box-shadow: 0px 0px 30px 0px rgba(0, 24, 164, 0.20);
 }
-
-
-
 
 /* MEDIA QUERIES for enhanced grid layout on larger screens */
 @media (min-width: 768px) {
@@ -130,13 +191,25 @@ li {
   }
 
   h2 {
-    color: var(--text-color);
-    font-size: 18px;
+    font-size: 20px;
+  }
+
+  h3 {
+    font-size: 14px;
+  }
+
+  p,
+  li {
+    font-size: 14px;
+  }
+
+  select.filter-select {
+    font-size: medium;
   }
 
   #recipe-section {
-  flex-direction: row;
-}
+    flex-direction: row;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -158,14 +231,23 @@ li {
   }
 
   h2 {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   h3 {
     font-size: 16px;
   }
 
+  p,
+  li {
+    font-size: 16px;
+  }
+
+  select.filter-select {
+    font-size: medium;
+  }
+
   #recipe-section {
-  flex-direction: row;
-}
+    flex-direction: row;
+  }
 }
