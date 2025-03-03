@@ -1,135 +1,122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Recipe Library</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
-  <link
-    rel="stylesheet"
-    href="./style.css"
-  />
-  <title>Recipe Library</title>
-</head>
+  <body>
+    <header>
+      <h1>Recipe Library</h1>
+    </header>
 
-<body>
-  <header>
-    <h1>Recipe Library</h1>
-  </header>
-
-  <main>
-    <section id="filter-section">
-      <div class="filters">
-        <h2>Filter on ingredients</h2>
-        <div
-          class="custom-select"
-          data-filter-type="ingredients"
-        >
-          <div
-            class="select-box blue"
-            onclick="toggleDropdown(event)"
-          >
-            <span class="selected-option">Choose an alternative</span>
-            <span class="icon">▼</span>
-          </div>
-          <div class="options-container blue">
-            <div
-              class="option"
-              onclick="selectOption('All ingredients', event)"
-            >All ingredients</div>
-            <div
-              class="option"
-              onclick="selectOption('Under 5 ingredients', event)"
-            >Under 5 ingredients</div>
-            <div
-              class="option"
-              onclick="selectOption('6-10 ingredients', event)"
-            >6-10 ingredients</div>
-            <div
-              class="option"
-              onclick="selectOption('11-15 ingredients', event)"
-            >11-15 ingredients</div>
-            <div
-              class="option"
-              onclick="selectOption('Over 16 ingredients', event)"
-            >Over 16 ingredients</div>
+    <main>
+      <section id="filter-section">
+        <div class="filters">
+          <h2>Filter on ingredients</h2>
+          <div class="custom-select" data-filter-type="ingredients">
+            <div class="select-box blue" onclick="toggleDropdown(event)">
+              <span class="selected-option">Choose an alternative</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container blue">
+              <div
+                class="option"
+                onclick="selectOption('All ingredients', event)"
+              >
+                All ingredients
+              </div>
+              <div
+                class="option"
+                onclick="selectOption('Under 5 ingredients', event)"
+              >
+                Under 5 ingredients
+              </div>
+              <div
+                class="option"
+                onclick="selectOption('6-10 ingredients', event)"
+              >
+                6-10 ingredients
+              </div>
+              <div
+                class="option"
+                onclick="selectOption('11-15 ingredients', event)"
+              >
+                11-15 ingredients
+              </div>
+              <div
+                class="option"
+                onclick="selectOption('Over 16 ingredients', event)"
+              >
+                Over 16 ingredients
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="filters">
-        <h2>Sort on time</h2>
-        <div
-          class="custom-select"
-          data-filter-type="time"
-        >
-          <div
-            class="select-box pink"
-            onclick="toggleDropdown(event)"
-          >
-            <span class="selected-option">Choose an alternative</span>
-            <span class="icon">▼</span>
-          </div>
-          <div class="options-container pink">
-            <div
-              class="option"
-              onclick="selectOption('All times', event)"
-            >All times</div>
-            <div
-              class="option"
-              onclick="selectOption('Under 15 min', event)"
-            >Under 15 min</div>
-            <div
-              class="option"
-              onclick="selectOption('15-30 min', event)"
-            >15-30 min</div>
-            <div
-              class="option"
-              onclick="selectOption('30-60 min', event)"
-            >30-60 min</div>
-            <div
-              class="option"
-              onclick="selectOption('Over 60min', event)"
-            >Over 60min</div>
+        <div class="filters">
+          <h2>Sort on time</h2>
+          <div class="custom-select" data-filter-type="time">
+            <div class="select-box pink" onclick="toggleDropdown(event)">
+              <span class="selected-option">Choose an alternative</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container pink">
+              <div class="option" onclick="selectOption('All times', event)">
+                All times
+              </div>
+              <div class="option" onclick="selectOption('Under 15 min', event)">
+                Under 15 min
+              </div>
+              <div class="option" onclick="selectOption('15-30 min', event)">
+                15-30 min
+              </div>
+              <div class="option" onclick="selectOption('30-60 min', event)">
+                30-60 min
+              </div>
+              <div class="option" onclick="selectOption('Over 60min', event)">
+                Over 60min
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section id="recipe-section">
-      <div id="message-box">
-        <h2>Temporary placeholder for filters/sorting options</h2>
-      </div>
+      <section id="recipe-section">
+        <div id="message-box">
+          <h2>Temporary placeholder for filters/sorting options</h2>
+        </div>
 
-      <div id="recipe-grid">
-        <div class="recipe-card">
-          <img
-            src="./assets/placeholder-image.png"
-            alt="Recipe image"
-            class="recipe-image"
-          />
-          <div class="recipe-content">
-            <h2 id="recipe-title">Temporary placeholder recipe</h2>
-            <hr />
-            <p><strong>Cuisine:</strong> American</p>
-            <p><strong>Time:</strong> 1h 30min</p>
-            <hr />
-            <h3>Ingredients</h3>
-            <ul>
-              <li>6 bone-in chicken breast halves, or 6 chicken thighs and wings, skin-on</li>
-              <li>1/2 teaspoon coarse salt</li>
-              <li>1/2 teaspoon Mrs. Dash seasoning</li>
-              <li>1/4 teaspoon freshly ground black pepper</li>
-            </ul>
+        <div id="recipe-grid">
+          <div class="recipe-card">
+            <img
+              src="./assets/placeholder-image.png"
+              alt="Recipe image"
+              class="recipe-image"
+            />
+            <div class="recipe-content">
+              <h2 id="recipe-title">Temporary placeholder recipe</h2>
+              <hr />
+              <p><strong>Cuisine:</strong> American</p>
+              <p><strong>Time:</strong> 1h 30min</p>
+              <hr />
+              <h3>Ingredients</h3>
+              <ul>
+                <li>
+                  6 bone-in chicken breast halves, or 6 chicken thighs and
+                  wings, skin-on
+                </li>
+                <li>1/2 teaspoon coarse salt</li>
+                <li>1/2 teaspoon Mrs. Dash seasoning</li>
+                <li>1/4 teaspoon freshly ground black pepper</li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-
-  </main>
-  <script src="./scripts.js"></script>
-</body>
-
+      </section>
+    </main>
+    <script src="./scripts.js"></script>
+  </body>
 </html>
