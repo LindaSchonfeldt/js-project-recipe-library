@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -57,13 +57,13 @@
         </div>
 
         <div class="filters">
-          <h2>Sort on time</h2>
+          <h2>Filter on time</h2>
           <div class="custom-select" data-filter-type="time">
-            <div class="select-box pink" onclick="toggleDropdown(event)">
+            <div class="select-box blue" onclick="toggleDropdown(event)">
               <span class="selected-option">Choose an alternative</span>
               <span class="icon">▼</span>
             </div>
-            <div class="options-container pink">
+            <div class="options-container blue">
               <div class="option" onclick="selectOption('All times', event)">
                 All times
               </div>
@@ -73,11 +73,29 @@
               <div class="option" onclick="selectOption('15-30 min', event)">
                 15-30 min
               </div>
-              <div class="option" onclick="selectOption('30-60 min', event)">
-                30-60 min
+              <div class="option" onclick="selectOption('31-60 min', event)">
+                31-60 min
               </div>
-              <div class="option" onclick="selectOption('Over 60min', event)">
+              <div class="option" onclick="selectOption('Over 60 min', event)">
                 Over 60min
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters">
+          <h2>Sort recipes</h2>
+          <div class="custom-select" data-filter-type="sort">
+            <div class="select-box pink" onclick="toggleDropdown(event)">
+              <span class="selected-option">Choose an alternative</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container pink">
+              <div class="option" onclick="selectOption('Ascending', event)">
+                Ascending
+              </div>
+              <div class="option" onclick="selectOption('Descending', event)">
+                Descending
               </div>
             </div>
           </div>
@@ -89,32 +107,7 @@
           <h2>Temporary placeholder for filters/sorting options</h2>
         </div>
 
-        <div id="recipe-grid">
-          <div class="recipe-card">
-            <img
-              src="./assets/placeholder-image.png"
-              alt="Recipe image"
-              class="recipe-image"
-            />
-            <div class="recipe-content">
-              <h2 id="recipe-title">Temporary placeholder recipe</h2>
-              <hr />
-              <p><strong>Cuisine:</strong> American</p>
-              <p><strong>Time:</strong> 1h 30min</p>
-              <hr />
-              <h3>Ingredients</h3>
-              <ul>
-                <li>
-                  6 bone-in chicken breast halves, or 6 chicken thighs and
-                  wings, skin-on
-                </li>
-                <li>1/2 teaspoon coarse salt</li>
-                <li>1/2 teaspoon Mrs. Dash seasoning</li>
-                <li>1/4 teaspoon freshly ground black pepper</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <div id="recipe-grid"></div>
       </section>
     </main>
     <script src="./scripts.js"></script>
