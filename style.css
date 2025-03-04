@@ -160,6 +160,25 @@ li {
   padding: 0.8rem;
 }
 
+#random-button {
+  font-family: "Futura", sans-serif;
+  font-size: 16px;
+  height: 3rem;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0rem 1rem 0rem;
+  color: #fff;
+  background-color: #0018a4;
+  border: #0018a4 solid 2px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#random-button:hover {
+  color: #0018a4;
+  background-color: #fff;
+  border: #0018a4 solid 2px;
+}
+
 #recipe-grid {
   display: flex;
   flex-direction: column;
@@ -223,7 +242,11 @@ li {
   }
 
   #filter-section {
+    display: flex;
     flex-direction: row;
+    justify-content: flex-start;
+    align-items: end;
+    flex-wrap: wrap; /* Makes sure that the elements adapt with smaller screens */
     gap: 1rem;
   }
 
@@ -241,7 +264,8 @@ li {
 }
 
 .recipe-card {
-  width: auto;
+  width: 300px;
+  height: auto;
 }
 
 @media (min-width: 1024px) {

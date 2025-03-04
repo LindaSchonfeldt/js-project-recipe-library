@@ -152,6 +152,7 @@ const recipes = [
 // DOM selectors
 const messageBox = document.getElementById("message-box")
 const filterSelects = document.querySelectorAll(".custom-select")
+const recipeGrid = document.getElementById("recipe-grid")
 
 function toggleDropdown(event) {
   event.stopPropagation()
@@ -192,15 +193,12 @@ filterSelects.forEach((select) => {
   select.addEventListener("change", (event) => {
     // Get the chosen value from the data attribute
     const selectedValue = select.dataset.value
-    // Get the type of filter via a data attribute (make sure it's in the HTML, t.ex. data-filter-type="ingredients")
+    // Get the type of filter via a data attribute (make sure it's in the HTML, e.g. data-filter-type="ingredients")
     const filterType = select.dataset.filterType
 
     // Log and print the results
     console.log(`Chosen filter type: ${filterType} - Value: ${selectedValue}`)
     messageBox.innerHTML += `<p>Chosen filter type: ${filterType} - Value: ${selectedValue}</p>`
-
-    // Exempel: anropa en funktion för att uppdatera recepten
-    // updateRecipeList(filterType, selectedValue);
   })
 })
 
@@ -275,28 +273,32 @@ function sortRecipesByIngredients() {
 
 // Function to show the filtered recipes in the UI
 function displayRecipes(filteredRecipes) {
-  const recipeGrid = document.getElementById("recipe-grid")
-  recipeGrid.innerHTML = "" // Clear earlier content
-
+  recipeGrid.innerHTML = "" // Rensa tidigare innehåll
   filteredRecipes.forEach((recipe) => {
-    const recipeCard = document.createElement("div")
-    recipeCard.classList.add("recipe-card")
-    recipeCard.innerHTML = `
-      <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
-      <div class="recipe-content">
-        <h2>${recipe.title}</h2>
-        <hr>
-        <p><strong>Cuisine:</strong> ${recipe.cuisine}</p>
-        <p><strong>Time:</strong> ${recipe.readyInMinutes} min</p>
-        <hr>
-        <h3>Ingredients</h3>
-        <ul>${recipe.ingredients
-          .map((ingredient) => `<li>${ingredient}</li>`)
-          .join("")}</ul>
-      </div>
-    `
+    const recipeCard = createRecipeCard(recipe)
     recipeGrid.appendChild(recipeCard)
   })
+}
+
+// Create recipeCard
+const createRecipeCard = (recipe) => {
+  const recipeCard = document.createElement("div")
+  recipeCard.classList.add("recipe-card")
+  recipeCard.innerHTML = `
+    <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
+    <div class="recipe-content">
+      <h2>${recipe.title}</h2>
+      <hr>
+      <p><strong>Cuisine:</strong> ${recipe.cuisine}</p>
+      <p><strong>Time:</strong> ${recipe.readyInMinutes} min</p>
+      <hr>
+      <h3>Ingredients</h3>
+      <ul>${recipe.ingredients
+        .map((ingredient) => `<li>${ingredient}</li>`)
+        .join("")}</ul>
+    </div>
+  `
+  return recipeCard
 }
 
 // Listen after changes in the dropdown and call the sorting function
@@ -308,25 +310,57 @@ filterSelects.forEach((select) => {
   })
 })
 
-function sortRecipes(option) {
-  const recipeGrid = document.getElementById("recipe-grid")
-  const displayedRecipes = Array.from(recipeGrid.children)
+// Function to sort the displayed recipes in the recipe-grid
+function sortRecipes(option, criteria) {
+  console.log("Sorting recipes:", option, criteria) // Kolla att rätt alternativ skickas
 
-  let sortedRecipes = displayedRecipes.sort((a, b) => {
-    const titleA = a.querySelector("h2").textContent.toLowerCase()
-    const titleB = b.querySelector("h2").textContent.toLowerCase()
-
-    return option === "Ascending"
-      ? titleA.localeCompare(titleB)
-      : titleB.localeCompare(titleA)
+  const displayedRecipes = Array.from(recipeGrid.children).map((recipeCard) => {
+    const title = recipeCard.querySelector("h2").textContent
+    return recipes.find((recipe) => recipe.title === title)
   })
 
-  recipeGrid.innerHTML = "" // Clear current grid
-  sortedRecipes.forEach((recipe) => recipeGrid.appendChild(recipe)) // Put the sorted element back
+  displayedRecipes.sort((a, b) => {
+    let valueA = criteria === "title" ? a.title.toLowerCase() : a.readyInMinutes
+    let valueB = criteria === "title" ? b.title.toLowerCase() : b.readyInMinutes
+
+    return option === "Ascending"
+      ? valueA > valueB
+        ? 1
+        : -1
+      : valueA < valueB
+      ? 1
+      : -1
+  })
+
+  console.log("Sorted recipes:", displayedRecipes) // Se till att sortering sker
+  displayRecipes(displayedRecipes)
 }
 
 document
   .querySelector('[data-filter-type="sort"]')
   .addEventListener("change", function () {
-    sortRecipes(this.dataset.value)
+    sortRecipes(this.dataset.value, "title")
   })
+
+document
+  .querySelector('[data-filter-type="time"]')
+  .addEventListener("change", function () {
+    sortRecipes(this.dataset.value, "time")
+  })
+
+// Function that generates a random recipe when pressing random-button
+const generateRandomRecipe = () => {
+  const randomButton = document.getElementById("random-button")
+
+  randomButton.addEventListener("click", () => {
+    const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)]
+    displayRandomRecipe(randomRecipe)
+  })
+}
+
+const displayRandomRecipe = (recipe) => {
+  recipeGrid.innerHTML = ""
+  recipeGrid.appendChild(createRecipeCard(recipe))
+}
+
+generateRandomRecipe()
