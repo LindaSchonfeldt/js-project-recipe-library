@@ -18,10 +18,10 @@ const recipes = [
       "paprika",
       "vegetable broth",
       "olive oil",
-      "salt",
+      "salt"
     ],
     pricePerServing: 2.5,
-    popularity: 85,
+    popularity: 85
   },
   {
     id: 2,
@@ -40,10 +40,10 @@ const recipes = [
       "pine nuts",
       "olive oil",
       "salt",
-      "black pepper",
+      "black pepper"
     ],
     pricePerServing: 3.0,
-    popularity: 92,
+    popularity: 92
   },
   {
     id: 3,
@@ -66,10 +66,10 @@ const recipes = [
       "cornstarch",
       "green onion",
       "sesame seeds",
-      "rice",
+      "rice"
     ],
     pricePerServing: 4.0,
-    popularity: 78,
+    popularity: 78
   },
   {
     id: 4,
@@ -86,10 +86,10 @@ const recipes = [
       "taco seasoning",
       "lettuce",
       "tomato",
-      "avocado",
+      "avocado"
     ],
     pricePerServing: 2.8,
-    popularity: 88,
+    popularity: 88
   },
   {
     id: 5,
@@ -102,7 +102,7 @@ const recipes = [
     cuisine: "Middle Eastern",
     ingredients: ["chickpeas", "tahini", "garlic", "lemon juice", "olive oil"],
     pricePerServing: 1.5,
-    popularity: 95,
+    popularity: 95
   },
   {
     id: 6,
@@ -115,7 +115,7 @@ const recipes = [
     cuisine: "Mediterranean",
     ingredients: ["bread", "avocado", "lemon juice", "salt"],
     pricePerServing: 2.0,
-    popularity: 90,
+    popularity: 90
   },
   {
     id: 7,
@@ -142,21 +142,20 @@ const recipes = [
       "butter",
       "flour",
       "celery",
-      "mushrooms",
+      "mushrooms"
     ],
     pricePerServing: 5.5,
-    popularity: 80,
-  },
+    popularity: 80
+  }
 ]
 
 // DOM selectors
-const messageBox = document.getElementById("message-box")
 const filterSelects = document.querySelectorAll(".custom-select")
 const recipeGrid = document.getElementById("recipe-grid")
 
 function toggleDropdown(event) {
   event.stopPropagation()
-  // Find the correct custom-select that belongs with the clicked select-box
+  // Find the correct custom-select that belongs to the clicked select-box
   const selectContainer = event.currentTarget.parentElement
   selectContainer.classList.toggle("active")
 }
@@ -198,7 +197,6 @@ filterSelects.forEach((select) => {
 
     // Log and print the results
     console.log(`Chosen filter type: ${filterType} - Value: ${selectedValue}`)
-    messageBox.innerHTML += `<p>Chosen filter type: ${filterType} - Value: ${selectedValue}</p>`
   })
 })
 
