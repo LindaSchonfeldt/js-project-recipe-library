@@ -305,9 +305,9 @@ const generateRandomRecipe = () => {
   updateRecipeList([randomRecipe])
 }
 
-// Get the selected sort order
+// Get the selected sort order for the currently displayed recipes
 const getSortOrder = () => {
-  console.log("getSortOrder() körs!") // Debugga om funktionen ens anropas
+  console.log("getSortOrder() is running!")
 
   const sortOrder = document
     .querySelector('[data-filter-type="sort"] .selected-option')
@@ -315,6 +315,30 @@ const getSortOrder = () => {
   console.log("Selected sort order:", sortOrder) // Test it
 
   sortRecipes(sortOrder)
+}
+
+const sortRecipes = (order) => {
+  console.log("Sorting order:", order)
+
+  // Get all the current recipes in the UI
+  let currentRecipes = [...document.querySelectorAll(".recipe-card")].map(
+    (card) => {
+      return recipes.find(
+        (recipe) => recipe.title === card.querySelector("h3").textContent
+      )
+    }
+  )
+
+  let sortedRecipes = [...currentRecipes]
+
+  if (order === "Ascending") {
+    sortedRecipes.sort((a, b) => a.readyInMinutes - b.readyInMinutes)
+  } else if (order === "Descending") {
+    sortedRecipes.sort((a, b) => b.readyInMinutes - a.readyInMinutes)
+  }
+
+  // Update the UI with the sorted recipes
+  updateRecipeList(sortedRecipes)
 }
 
 // EVENT LISTENERS
