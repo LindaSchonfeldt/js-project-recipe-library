@@ -69,6 +69,56 @@
         </div>
 
         <div class="filters">
+          <h2>Filter on cuisine</h2>
+          <div class="custom-select" data-filter-type="cuisine">
+            <div class="select-box blue" onclick="toggleDropdown(event)">
+              <span class="selected-option">All cuisines</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container blue">
+              <div class="option" onclick="selectedOption(event)">
+                All cuisines
+              </div>
+              <div class="option" onclick="selectedOption(event)">
+                Mediterranean
+              </div>
+              <div class="option" onclick="selectedOption(event)">Italian</div>
+              <div class="option" onclick="selectedOption(event)">Asian</div>
+              <div class="option" onclick="selectedOption(event)">Mexican</div>
+              <div class="option" onclick="selectedOption(event)">
+                Middle Eastern
+              </div>
+              <div class="option" onclick="selectedOption(event)">European</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters">
+          <h2>Filter on diet</h2>
+          <div class="custom-select" data-filter-type="diet">
+            <div class="select-box blue" onclick="toggleDropdown(event)">
+              <span class="selected-option">All diets</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container blue">
+              <div class="option" onclick="selectedOption(event)">
+                All diets
+              </div>
+              <div class="option" onclick="selectedOption(event)">Vegan</div>
+              <div class="option" onclick="selectedOption(event)">
+                Vegetarian
+              </div>
+              <div class="option" onclick="selectedOption(event)">
+                Gluten-free
+              </div>
+              <div class="option" onclick="selectedOption(event)">
+                Dairy-free
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters">
           <h2>Sort recipes</h2>
           <div class="custom-select" data-filter-type="sort">
             <div class="select-box pink" onclick="toggleDropdown(event)">

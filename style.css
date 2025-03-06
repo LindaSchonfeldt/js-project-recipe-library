@@ -10,6 +10,13 @@
   --text-color: #000;
 }
 
+/* Reset some default browser styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 /* Overall Grid Layout for the Page */
 body {
   display: grid;

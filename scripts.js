@@ -198,13 +198,21 @@ const selectedOption = (event) => {
 }
 
 const filterRecipes = () => {
-  // Get selected time filter
+  // Get selected filters
   const timeFilter = document
     .querySelector('[data-filter-type="time"] .selected-option')
     .textContent.trim()
-  // Get selected ingredients filter
+
   const ingredientFilter = document
     .querySelector('[data-filter-type="ingredients"] .selected-option')
+    .textContent.trim()
+
+  const cuisineFilter = document
+    .querySelector('[data-filter-type="cuisine"] .selected-option')
+    .textContent.trim()
+
+  const dietFilter = document
+    .querySelector('[data-filter-type="diet"] .selected-option')
     .textContent.trim()
 
   // Check if recipes exists
@@ -218,6 +226,9 @@ const filterRecipes = () => {
   const filteredRecipes = recipes.filter((recipe) => {
     // Assume match unless proven otherwise
     let timeMatch = true
+    let ingredientMatch = true
+    let cuisineMatch = true
+    let dietMatch = true
 
     // Time filter
     // Check if a specific time is selected, otherwise, all times are included
@@ -232,9 +243,6 @@ const filterRecipes = () => {
         timeMatch = recipe.readyInMinutes > 60
       }
     }
-
-    // Assume match unless proven otherwise
-    let ingredientMatch = true
 
     // Ingredient filter
     // Check if a specific number of ingredient is selected, otherwise, all number of ingredient are included
@@ -253,8 +261,19 @@ const filterRecipes = () => {
       }
     }
 
-    return timeMatch && ingredientMatch
+    // Cuisine filter
+    if (cuisineFilter !== "All cuisines") {
+      cuisineMatch = recipe.cuisine === cuisineFilter
+    }
+
+    // Diet filter
+    if (dietFilter !== "All diets") {
+      dietMatch = recipe.diets.includes(dietFilter)
+    }
+
+    return timeMatch && ingredientMatch && cuisineMatch && dietMatch
   })
+
   // Check that the filtration works
   console.log(filteredRecipes)
   // Update the UI
