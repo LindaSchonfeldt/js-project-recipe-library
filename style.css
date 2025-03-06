@@ -170,7 +170,7 @@ li {
   border: #0018a4 solid 2px;
   border-radius: 8px;
   cursor: pointer;
-  align-self: flex-end; /* Aligns the button to the bottom right */
+  align-self: flex-start; /* Aligns the button to the left */
 }
 
 #random-button:hover {
@@ -249,6 +249,10 @@ li {
     align-items: end;
     flex-wrap: wrap; /* Makes sure that the elements adapt with smaller screens */
     gap: 1rem;
+  }
+
+  #random-button {
+    align-self: flex-end; /* Aligns the button to the bottom right */
   }
 
   #recipe-section {

@@ -166,18 +166,19 @@ const toggleDropdown = (event) => {
   // Find the closest .custom-select for the clicked element
   const dropdown = event.currentTarget.closest(".custom-select")
 
-  // Close all other dropdowns
-  document.querySelectorAll(".custom-select").forEach((select) => {
-    if (select !== dropdown) {
+  // Close all other dropdowns only if the clicked dropdown is not already active
+  if (!dropdown.classList.contains("active")) {
+    document.querySelectorAll(".custom-select").forEach((select) => {
       select.classList.remove("active")
-    }
-  })
+    })
+  }
 
   // Toggle the active state of the clicked dropdown
   dropdown.classList.toggle("active")
 }
 
 const selectedOption = (event) => {
+  console.log("Option selected:", event.currentTarget.textContent)
   const option = event.currentTarget
   // Dropdown is now a local variable!
   const dropdown = option.closest(".custom-select")
@@ -190,6 +191,10 @@ const selectedOption = (event) => {
 
   // Apply filtering after selection
   filterRecipes()
+
+  if (dropdown.dataset.filterType === "sort") {
+    getSortOrder() // Call the sort function
+  }
 }
 
 const filterRecipes = () => {
@@ -204,6 +209,7 @@ const filterRecipes = () => {
 
   // Check if recipes exists
   if (!recipes || recipes.length === 0) {
+    recipeGrid.innerHTML = "<p>No recipes found.</p>"
     console.warn("No recipes available to filter")
     return
   }
@@ -291,8 +297,57 @@ const updateRecipeList = (filteredRecipes) => {
   })
 }
 
+// Random Recipe Generator
+const generateRandomRecipe = () => {
+  // Get a random recipe from the array
+  const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)]
+  // Update the UI with the random recipe
+  updateRecipeList([randomRecipe])
+}
+
+// Get the selected sort order
+const getSortOrder = () => {
+  console.log("getSortOrder() körs!") // Debugga om funktionen ens anropas
+
+  // Hämta den valda sorteringsmetoden
+  const sortOrder = document
+    .querySelector('[data-filter-type="sort"] .selected-option')
+    .textContent.trim()
+  console.log("Selected sort order:", sortOrder) // Test it
+
+  sortRecipes(sortOrder)
+}
+
+const sortRecipes = (order) => {
+  console.log("Sorting order:", order)
+
+  // Get all the current recipes in the UI
+  let currentRecipes = [...document.querySelectorAll(".recipe-card")].map(
+    (card) => {
+      return recipes.find(
+        (recipe) => recipe.title === card.querySelector("h3").textContent
+      )
+    }
+  )
+
+  let sortedRecipes = [...currentRecipes]
+
+  if (order === "Ascending") {
+    sortedRecipes.sort((a, b) => a.readyInMinutes - b.readyInMinutes)
+  } else if (order === "Descending") {
+    sortedRecipes.sort((a, b) => b.readyInMinutes - a.readyInMinutes)
+  }
+
+  // Update the UI with the sorted recipes
+  updateRecipeList(sortedRecipes)
+}
+
 // EVENT LISTENERS
 // (only add them once!)
 document.addEventListener("DOMContentLoaded", () => {
   updateRecipeList(recipes) // Loads all recipes at the start
+})
+
+document.getElementById("random-button").addEventListener("click", () => {
+  generateRandomRecipe()
 })
