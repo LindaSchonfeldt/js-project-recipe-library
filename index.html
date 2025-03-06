@@ -18,39 +18,24 @@
           <h2>Filter on ingredients</h2>
           <div class="custom-select" data-filter-type="ingredients">
             <div class="select-box blue" onclick="toggleDropdown(event)">
-              <span class="selected-option">Choose an alternative</span>
+              <span class="selected-option">All ingredients</span>
               <span class="icon">▼</span>
             </div>
             <div class="options-container blue">
-              <div
-                class="option"
-                onclick="selectOption('All ingredients', event)"
-              >
+              <div class="option" onclick="selectedOption(event)">
                 All ingredients
               </div>
-              <div
-                class="option"
-                onclick="selectOption('Under 5 ingredients', event)"
-              >
+              <div class="option" onclick="selectedOption(event)">
                 Under 5 ingredients
               </div>
-              <div
-                class="option"
-                onclick="selectOption('6-10 ingredients', event)"
-              >
-                6-10 ingredients
+              <div class="option" onclick="selectedOption(event)">
+                5-10 ingredients
               </div>
-              <div
-                class="option"
-                onclick="selectOption('11-15 ingredients', event)"
-              >
+              <div class="option" onclick="selectedOption(event)">
                 11-15 ingredients
               </div>
-              <div
-                class="option"
-                onclick="selectOption('Over 16 ingredients', event)"
-              >
-                Over 16 ingredients
+              <div class="option" onclick="selectedOption(event)">
+                Over 15 ingredients
               </div>
             </div>
           </div>
@@ -60,24 +45,24 @@
           <h2>Filter on time</h2>
           <div class="custom-select" data-filter-type="time">
             <div class="select-box blue" onclick="toggleDropdown(event)">
-              <span class="selected-option">Choose an alternative</span>
+              <span class="selected-option">All times</span>
               <span class="icon">▼</span>
             </div>
             <div class="options-container blue">
-              <div class="option" onclick="selectOption('All times', event)">
+              <div class="option" onclick="selectedOption(event)">
                 All times
               </div>
-              <div class="option" onclick="selectOption('Under 15 min', event)">
+              <div class="option" onclick="selectedOption(event)">
                 Under 15 min
               </div>
-              <div class="option" onclick="selectOption('15-30 min', event)">
+              <div class="option" onclick="selectedOption(event)">
                 15-30 min
               </div>
-              <div class="option" onclick="selectOption('31-60 min', event)">
+              <div class="option" onclick="selectedOption(event)">
                 31-60 min
               </div>
-              <div class="option" onclick="selectOption('Over 60 min', event)">
-                Over 60min
+              <div class="option" onclick="selectedOption(event)">
+                Over 60 min
               </div>
             </div>
           </div>
@@ -91,12 +76,8 @@
               <span class="icon">▼</span>
             </div>
             <div class="options-container pink">
-              <div class="option" onclick="selectOption('Ascending', event)">
-                Ascending
-              </div>
-              <div class="option" onclick="selectOption('Descending', event)">
-                Descending
-              </div>
+              <div class="option">Ascending</div>
+              <div class="option">Descending</div>
             </div>
           </div>
         </div>
@@ -108,6 +89,6 @@
         <div id="recipe-grid"></div>
       </section>
     </main>
-    <script src="./scripts.js"></script>
+    <script src="./scripts.js" defer></script>
   </body>
 </html>

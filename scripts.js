@@ -1,3 +1,4 @@
+// RECIPE ARRAY
 const recipes = [
   {
     id: 1,
@@ -149,216 +150,147 @@ const recipes = [
   }
 ]
 
-// DOM selectors
-const filterSelects = document.querySelectorAll(".custom-select")
+console.log("Recipes loaded:", recipes)
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateRecipeList(recipes) // Loads all recipes at the start
+})
+
+// DOM Selectors
+
 const recipeGrid = document.getElementById("recipe-grid")
 
-function toggleDropdown(event) {
-  event.stopPropagation()
-  // Find the correct custom-select that belongs to the clicked select-box
-  const selectContainer = event.currentTarget.parentElement
-  selectContainer.classList.toggle("active")
-}
+// FUNCTIONS
 
-function selectOption(value, event) {
-  event.stopPropagation()
-  // Find the correct custom-select container
-  const selectContainer = event.currentTarget.closest(".custom-select")
-  const selectedOption = selectContainer.querySelector(".selected-option")
+const toggleDropdown = (event) => {
+  // Find the closest .custom-select for the clicked element
+  const dropdown = event.currentTarget.closest(".custom-select")
 
-  // Set the chosen value and close the dropdown
-  selectedOption.textContent = value
-  selectContainer.classList.remove("active")
-
-  // Save the value in a data attribute for later use
-  selectContainer.dataset.value = value
-
-  // Create and invoke a custom 'change' event on this custom-select
-  const changeEvent = new Event("change", { bubbles: true })
-  selectContainer.dispatchEvent(changeEvent)
-}
-
-// Closes all the open dropdowns if clicking outside of them
-document.addEventListener("click", function (event) {
-  document.querySelectorAll(".custom-select").forEach(function (select) {
-    if (!select.contains(event.target)) {
+  // Close all other dropdowns
+  document.querySelectorAll(".custom-select").forEach((select) => {
+    if (select !== dropdown) {
       select.classList.remove("active")
     }
   })
-})
 
-// Listen for 'change' event for each custom-select
-filterSelects.forEach((select) => {
-  select.addEventListener("change", (event) => {
-    // Get the chosen value from the data attribute
-    const selectedValue = select.dataset.value
-    // Get the type of filter via a data attribute (make sure it's in the HTML, e.g. data-filter-type="ingredients")
-    const filterType = select.dataset.filterType
-
-    // Log and print the results
-    console.log(`Chosen filter type: ${filterType} - Value: ${selectedValue}`)
-  })
-})
-
-// Create a function to filter recipes after time
-function sortRecipesByTime() {
-  const selectedFilter = document.querySelector('[data-filter-type="time"]')
-    ?.dataset.value
-
-  let filteredRecipes = []
-
-  // Filter recipes depending on the chosen alternative
-  if (selectedFilter === "Under 15 min") {
-    filteredRecipes = recipes.filter((recipe) => recipe.readyInMinutes < 15)
-  } else if (selectedFilter === "15-30 min") {
-    filteredRecipes = recipes.filter(
-      (recipe) => recipe.readyInMinutes >= 15 && recipe.readyInMinutes <= 30
-    )
-  } else if (selectedFilter === "31-60 min") {
-    filteredRecipes = recipes.filter(
-      (recipe) => recipe.readyInMinutes >= 31 && recipe.readyInMinutes <= 60
-    )
-  } else if (selectedFilter === "Over 60 min") {
-    filteredRecipes = recipes.filter((recipe) => recipe.readyInMinutes > 60)
-  } else {
-    // If All times is chosen return all recipes
-    filteredRecipes = recipes
-  }
-
-  displayRecipes(filteredRecipes)
+  // Toggle the active state of the clicked dropdown
+  dropdown.classList.toggle("active")
 }
 
-filterSelects.forEach((select) => {
-  select.addEventListener("change", () => {
-    if (select.dataset.filterType === "time") {
-      sortRecipesByTime()
+const selectedOption = (event) => {
+  const option = event.currentTarget
+  // Dropdown is now a local variable!
+  const dropdown = option.closest(".custom-select")
+
+  // Update the dropdown's heading (.selected-option) with the chosen option
+  dropdown.querySelector(".selected-option").textContent =
+    option.textContent.trim()
+  // Close the dropdown after selection
+  dropdown.classList.remove("active")
+
+  // Apply filtering after selection
+  filterRecipes()
+}
+
+const filterRecipes = () => {
+  // Get selected time filter
+  const timeFilter = document
+    .querySelector('[data-filter-type="time"] .selected-option')
+    .textContent.trim()
+  // Get selected ingredients filter
+  const ingredientFilter = document
+    .querySelector('[data-filter-type="ingredients"] .selected-option')
+    .textContent.trim()
+
+  // Check if recipes exists
+  if (!recipes || recipes.length === 0) {
+    console.warn("No recipes available to filter")
+    return
+  }
+
+  // Filter recipes based on selected time
+  const filteredRecipes = recipes.filter((recipe) => {
+    // Assume match unless proven otherwise
+    let timeMatch = true
+    // Time filter
+    // Check if a specific time is selected, otherwise, all times are included
+    if (timeFilter !== "All times") {
+      if (timeFilter === "Under 15 min") {
+        timeMatch = recipe.readyInMinutes < 15
+      } else if (timeFilter === "15-30 min") {
+        timeMatch = recipe.readyInMinutes >= 15 && recipe.readyInMinutes <= 30
+      } else if (timeFilter === "31-60 min") {
+        timeMatch = recipe.readyInMinutes >= 31 && recipe.readyInMinutes <= 60
+      } else if (timeFilter === "Over 60 min") {
+        timeMatch = recipe.readyInMinutes > 60
+      }
     }
+
+    // Assume match unless proven otherwise
+    let ingredientMatch = true
+    // Ingredient filter
+    // Check if a specific number of ingredient is selected, otherwise, all number of ingredient are included
+    if (ingredientFilter !== "All ingredients") {
+      if (ingredientFilter === "Under 5 ingredients") {
+        ingredientMatch = recipe.ingredients.length < 5
+      } else if (ingredientFilter === "6-10 ingredients") {
+        //Corrected error, it was "5-10"
+        ingredientMatch =
+          recipe.ingredients.length >= 6 && recipe.ingredients.length <= 10
+      } else if (ingredientFilter === "11-15 ingredients") {
+        ingredientMatch =
+          recipe.ingredients.length >= 11 && recipe.ingredients.length <= 15
+      } else if (ingredientFilter === "Over 15 ingredients") {
+        ingredientMatch = recipe.ingredients.length > 15
+      }
+    }
+
+    return timeMatch && ingredientMatch
   })
-})
-
-// Create a function to filter recipes after number of ingredients
-function sortRecipesByIngredients() {
-  // Get the chosen value from the dropdown menu
-  const selectedFilter = document.querySelector(
-    '[data-filter-type="ingredients"]'
-  ).dataset.value
-
-  let filteredRecipes = []
-
-  // Filter the recipes depending on the chosen alternative
-  if (selectedFilter === "Under 5 ingredients") {
-    filteredRecipes = recipes.filter((recipe) => recipe.ingredients.length < 5)
-  } else if (selectedFilter === "6-10 ingredients") {
-    filteredRecipes = recipes.filter(
-      (recipe) =>
-        recipe.ingredients.length >= 6 && recipe.ingredients.length <= 10
-    )
-  } else if (selectedFilter === "11-15 ingredients") {
-    filteredRecipes = recipes.filter(
-      (recipe) =>
-        recipe.ingredients.length >= 11 && recipe.ingredients.length <= 15
-    )
-  } else if (selectedFilter === "Over 16 ingredients") {
-    filteredRecipes = recipes.filter((recipe) => recipe.ingredients.length > 16)
-  } else {
-    // If All ingredients is chosen return all recipes
-    filteredRecipes = recipes
-  }
-
-  // Uppdate the UI to show the filtered recipes
-  displayRecipes(filteredRecipes)
+  // Check that the filtration works
+  console.log(filteredRecipes)
+  // Update the UI
+  updateRecipeList(filteredRecipes)
 }
 
-// Function to show the filtered recipes in the UI
-function displayRecipes(filteredRecipes) {
-  recipeGrid.innerHTML = "" // Rensa tidigare innehåll
+const updateRecipeList = (filteredRecipes) => {
+  const recipeGrid = document.getElementById("recipe-grid")
+  // Clear the grid before adding new recipes
+  recipeGrid.innerHTML = ""
+
+  // Check if there are no recipes to display
+  if (!filteredRecipes || filteredRecipes.length === 0) {
+    recipeGrid.innerHTML = "<p>No recipes found.</p>"
+    return
+  }
+
   filteredRecipes.forEach((recipe) => {
-    const recipeCard = createRecipeCard(recipe)
+    const recipeCard = document.createElement("div")
+    recipeCard.classList.add("recipe-card")
+
+    // Create a list of ingredients
+    const ingredientsHTML = recipe.ingredients
+      .map((ingredient) => `<li>${ingredient}</li>`)
+      .join("")
+
+    // Add recipe details inside the div
+    recipeCard.innerHTML = `
+     <img src="${recipe.image}" alt="${recipe.title}">
+    <h3>${recipe.title}</h3>
+    <p><b>Time:</b> ${recipe.readyInMinutes}</p>
+    <p><b>Servings:</b> ${recipe.servings}</p>
+    <p><b>Ingredients:</b></p>
+    <ul>
+    ${ingredientsHTML}
+    </ul>
+    `
+    // Append the recipe card to the recipe grid
     recipeGrid.appendChild(recipeCard)
   })
 }
 
-// Create recipeCard
-const createRecipeCard = (recipe) => {
-  const recipeCard = document.createElement("div")
-  recipeCard.classList.add("recipe-card")
-  recipeCard.innerHTML = `
-    <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
-    <div class="recipe-content">
-      <h2>${recipe.title}</h2>
-      <hr>
-      <p><strong>Cuisine:</strong> ${recipe.cuisine}</p>
-      <p><strong>Time:</strong> ${recipe.readyInMinutes} min</p>
-      <hr>
-      <h3>Ingredients</h3>
-      <ul>${recipe.ingredients
-        .map((ingredient) => `<li>${ingredient}</li>`)
-        .join("")}</ul>
-    </div>
-  `
-  return recipeCard
-}
-
-// Listen after changes in the dropdown and call the sorting function
-filterSelects.forEach((select) => {
-  select.addEventListener("change", () => {
-    if (select.dataset.filterType === "ingredients") {
-      sortRecipesByIngredients()
-    }
-  })
+// EVENT LISTENERS
+// (only add them once!)
+document.addEventListener("DOMContentLoaded", () => {
+  updateRecipeList(recipes) // Loads all recipes at the start
 })
-
-// Function to sort the displayed recipes in the recipe-grid
-function sortRecipes(option, criteria) {
-  console.log("Sorting recipes:", option, criteria) // Kolla att rätt alternativ skickas
-
-  const displayedRecipes = Array.from(recipeGrid.children).map((recipeCard) => {
-    const title = recipeCard.querySelector("h2").textContent
-    return recipes.find((recipe) => recipe.title === title)
-  })
-
-  displayedRecipes.sort((a, b) => {
-    let valueA = criteria === "title" ? a.title.toLowerCase() : a.readyInMinutes
-    let valueB = criteria === "title" ? b.title.toLowerCase() : b.readyInMinutes
-
-    return option === "Ascending"
-      ? valueA > valueB
-        ? 1
-        : -1
-      : valueA < valueB
-      ? 1
-      : -1
-  })
-
-  console.log("Sorted recipes:", displayedRecipes) // Se till att sortering sker
-  displayRecipes(displayedRecipes)
-}
-
-document
-  .querySelector('[data-filter-type="sort"]')
-  .addEventListener("change", function () {
-    sortRecipes(this.dataset.value, "title")
-  })
-
-document
-  .querySelector('[data-filter-type="time"]')
-  .addEventListener("change", function () {
-    sortRecipes(this.dataset.value, "time")
-  })
-
-// Function that generates a random recipe when pressing random-button
-const generateRandomRecipe = () => {
-  const randomButton = document.getElementById("random-button")
-
-  randomButton.addEventListener("click", () => {
-    const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)]
-    displayRandomRecipe(randomRecipe)
-  })
-}
-
-const displayRandomRecipe = (recipe) => {
-  recipeGrid.innerHTML = ""
-  recipeGrid.appendChild(createRecipeCard(recipe))
-}
-
-generateRandomRecipe()
