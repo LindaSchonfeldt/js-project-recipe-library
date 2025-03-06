@@ -212,6 +212,7 @@ const filterRecipes = () => {
   const filteredRecipes = recipes.filter((recipe) => {
     // Assume match unless proven otherwise
     let timeMatch = true
+
     // Time filter
     // Check if a specific time is selected, otherwise, all times are included
     if (timeFilter !== "All times") {
@@ -228,6 +229,7 @@ const filterRecipes = () => {
 
     // Assume match unless proven otherwise
     let ingredientMatch = true
+
     // Ingredient filter
     // Check if a specific number of ingredient is selected, otherwise, all number of ingredient are included
     if (ingredientFilter !== "All ingredients") {
