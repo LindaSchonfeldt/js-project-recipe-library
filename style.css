@@ -35,6 +35,24 @@ main {
   grid-column: span 4;
 }
 
+button {
+  font-family: "Futura", sans-serif;
+  font-size: 16px;
+  height: 3rem;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  background-color: #0018a4;
+  border: #0018a4 solid 2px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  color: #0018a4;
+  background-color: #fff;
+  border: #0018a4 solid 2px;
+}
+
 h1 {
   color: #0018a4;
   font-size: 40px;
@@ -165,25 +183,6 @@ li {
   min-height: 40vh;
   width: 50vh;
   padding: 0.8rem;
-}
-
-#random-button {
-  font-family: "Futura", sans-serif;
-  font-size: 16px;
-  height: 3rem;
-  padding: 0.5rem 1rem;
-  color: #fff;
-  background-color: #0018a4;
-  border: #0018a4 solid 2px;
-  border-radius: 8px;
-  cursor: pointer;
-  align-self: flex-start; /* Aligns the button to the left */
-}
-
-#random-button:hover {
-  color: #0018a4;
-  background-color: #fff;
-  border: #0018a4 solid 2px;
 }
 
 #recipe-grid {

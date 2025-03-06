@@ -152,13 +152,10 @@ const recipes = [
 
 console.log("Recipes loaded:", recipes)
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateRecipeList(recipes) // Loads all recipes at the start
-})
-
 // DOM SELECTORS
 
 const recipeGrid = document.getElementById("recipe-grid")
+const resetFilter = document.getElementById("reset-filter")
 
 // GLOBAL VARIABLES
 // List for chosen diets
@@ -384,6 +381,35 @@ const sortRecipes = (order) => {
   updateRecipeList(sortedRecipes)
 }
 
+const resetFilters = () => {
+  console.log("Reset filters clicked!")
+
+  document.querySelectorAll(".selected-option").forEach((option) => {
+    // Reset the text content of the dropdown heading, depending on the filter type
+    option.textContent =
+      option.closest(".custom-select").dataset.filterType === "diet"
+        ? "All diets"
+        : option.closest(".custom-select").dataset.filterType === "cuisine"
+        ? "All cuisines"
+        : option.closest(".custom-select").dataset.filterType === "time"
+        ? "All times"
+        : option.closest(".custom-select").dataset.filterType === "ingredients"
+        ? "All ingredients"
+        : "All"
+  })
+  dietFilters = []
+  console.log("Diet filters cleared:", dietFilters)
+
+  // Reset the selected state of the diet options
+  document
+    .querySelectorAll('[data-filter-type="diet"] .option')
+    .forEach((option) => {
+      option.dataset.selected = "false"
+    })
+
+  filterRecipes()
+}
+
 // EVENT LISTENERS
 // (only add them once!)
 document.addEventListener("DOMContentLoaded", () => {
@@ -393,3 +419,5 @@ document.addEventListener("DOMContentLoaded", () => {
 document.getElementById("random-button").addEventListener("click", () => {
   generateRandomRecipe()
 })
+
+document.getElementById("reset-filter").addEventListener("click", resetFilters)
