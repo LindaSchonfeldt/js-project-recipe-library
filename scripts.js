@@ -382,7 +382,10 @@ const sortRecipes = (order) => {
 }
 
 const resetFilters = () => {
-  console.log("Reset filters clicked!")
+  // Close open dropdowns
+  document.querySelectorAll(".custom-select").forEach((select) => {
+    select.classList.remove("active")
+  })
 
   document.querySelectorAll(".selected-option").forEach((option) => {
     // Reset the text content of the dropdown heading, depending on the filter type
@@ -398,7 +401,6 @@ const resetFilters = () => {
         : "All"
   })
   dietFilters = []
-  console.log("Diet filters cleared:", dietFilters)
 
   // Reset the selected state of the diet options
   document
