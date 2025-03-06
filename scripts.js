@@ -156,9 +156,13 @@ document.addEventListener("DOMContentLoaded", () => {
   updateRecipeList(recipes) // Loads all recipes at the start
 })
 
-// DOM Selectors
+// DOM SELECTORS
 
 const recipeGrid = document.getElementById("recipe-grid")
+
+// GLOBAL VARIABLES
+// List for chosen diets
+let dietFilters = []
 
 // FUNCTIONS
 
@@ -222,7 +226,7 @@ const filterRecipes = () => {
     return
   }
 
-  // Filter recipes based on selected time
+  // Filter the recipes
   const filteredRecipes = recipes.filter((recipe) => {
     // Assume match unless proven otherwise
     let timeMatch = true
@@ -266,18 +270,36 @@ const filterRecipes = () => {
       cuisineMatch = recipe.cuisine === cuisineFilter
     }
 
-    // Diet filter
-    if (dietFilter !== "All diets") {
-      dietMatch = recipe.diets.includes(dietFilter)
+    // Diet filter: Multiple selection - if some diets are chosen the recipe will atleast include one of them
+    if (dietFilters.length > 0) {
+      dietMatch = dietFilters.some((diet) => recipe.diets.includes(diet))
     }
-
     return timeMatch && ingredientMatch && cuisineMatch && dietMatch
   })
-
-  // Check that the filtration works
-  console.log(filteredRecipes)
-  // Update the UI
+  // Update the UI with the filtered recipes
   updateRecipeList(filteredRecipes)
+}
+
+const toggleDiet = (event) => {
+  const option = event.currentTarget
+  const diet = option.textContent.trim()
+
+  if (option.dataset.selected === "false") {
+    option.dataset.selected = "true"
+    dietFilters.push(diet) // Add diet to the dietFilters list
+  }
+  // Remove the diet from the list
+  else {
+    dietFilters = dietFilters.filter((item) => item !== diet) // Remove diet from the dietFilters list
+  }
+
+  // Update the text in the dropdown heading
+  const dropdown = option.closest(".custom-select")
+  const selectedText =
+    dietFilters.length > 0 ? dietFilters.join(", ") : "All diets"
+  dropdown.querySelector(".selected-option").textContent = selectedText
+
+  filterRecipes()
 }
 
 const updateRecipeList = (filteredRecipes) => {
@@ -304,6 +326,8 @@ const updateRecipeList = (filteredRecipes) => {
     recipeCard.innerHTML = `
      <img src="${recipe.image}" alt="${recipe.title}">
     <h3>${recipe.title}</h3>
+    <p><b>Cuisine:</b> ${recipe.cuisine}</p>
+    <p><b>Diet:</b> ${recipe.diets.join(", ")}</p>
     <p><b>Time:</b> ${recipe.readyInMinutes}</p>
     <p><b>Servings:</b> ${recipe.servings}</p>
     <p><b>Ingredients:</b></p>
