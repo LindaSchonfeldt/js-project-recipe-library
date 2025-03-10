@@ -150,7 +150,36 @@ const recipes = [
   }
 ]
 
-console.log("Recipes loaded:", recipes)
+// Fetch the recipe data from the API
+
+/* let recipes = [] // Empty array to store the fetched recipes
+fetch(URL)
+  .then((response) => response.json()) // Convert the response to JSON
+  .then((data) => { */
+
+// Store the fetched recipe in the recipes array
+/*     recipes = data.recipes.map((recipe) => {
+      return {
+        id: recipe.id,
+        title: recipe.title,
+        image: recipe.image,
+        readyInMinutes: recipe.readyInMinutes,
+        servings: recipe.servings,
+        sourceUrl: recipe.sourceUrl,
+        diets: recipe.diets,
+        cuisine: recipe.cuisine,
+        ingredients: recipe.extendedIngredients.map(
+          (ingredient) => ingredient.original
+        ),
+        pricePerServing: recipe.pricePerServing,
+        popularity: recipe.spoonacularScore
+      }
+    })
+    updateRecipeList(recipes) // Update the UI with the fetched recipes
+  })
+  .catch((error) => {
+    console.error("Error fetching data:", error)
+  }) */
 
 // DOM SELECTORS
 
@@ -161,9 +190,14 @@ const resetFilter = document.getElementById("reset-filter")
 // List for chosen diets
 let dietFilters = []
 
+// Global variable to keep the filtered recipes
+let filteredRecipes = [...recipes]
+
 // FUNCTIONS
 
 const toggleDropdown = (event) => {
+  event.stopPropagation() // Prevent the dropdown from closing when clicking on the dropdown itself
+
   // Find the closest .custom-select for the clicked element
   const dropdown = event.currentTarget.closest(".custom-select")
 
@@ -179,22 +213,22 @@ const toggleDropdown = (event) => {
 }
 
 const selectedOption = (event) => {
-  console.log("Option selected:", event.currentTarget.textContent)
+  // Get the selected option
   const option = event.currentTarget
+
   // Dropdown is now a local variable!
   const dropdown = option.closest(".custom-select")
 
-  // Update the dropdown's heading (.selected-option) with the chosen option
+  // Update the dropdown's heading with the chosen option
   dropdown.querySelector(".selected-option").textContent =
     option.textContent.trim()
   // Close the dropdown after selection
   dropdown.classList.remove("active")
 
-  // Apply filtering after selection
-  filterRecipes()
-
   if (dropdown.dataset.filterType === "sort") {
     getSortOrder() // Call the sort function
+  } else {
+    filterRecipes()
   }
 }
 
@@ -224,7 +258,7 @@ const filterRecipes = () => {
   }
 
   // Filter the recipes
-  const filteredRecipes = recipes.filter((recipe) => {
+  filteredRecipes = recipes.filter((recipe) => {
     // Assume match unless proven otherwise
     let timeMatch = true
     let ingredientMatch = true
@@ -250,10 +284,9 @@ const filterRecipes = () => {
     if (ingredientFilter !== "All ingredients") {
       if (ingredientFilter === "Under 5 ingredients") {
         ingredientMatch = recipe.ingredients.length < 5
-      } else if (ingredientFilter === "6-10 ingredients") {
-        //Corrected error, it was "5-10"
+      } else if (ingredientFilter === "5-10 ingredients") {
         ingredientMatch =
-          recipe.ingredients.length >= 6 && recipe.ingredients.length <= 10
+          recipe.ingredients.length >= 5 && recipe.ingredients.length <= 10
       } else if (ingredientFilter === "11-15 ingredients") {
         ingredientMatch =
           recipe.ingredients.length >= 11 && recipe.ingredients.length <= 15
@@ -267,13 +300,20 @@ const filterRecipes = () => {
       cuisineMatch = recipe.cuisine === cuisineFilter
     }
 
-    // Diet filter: Multiple selection - if some diets are chosen the recipe will atleast include one of them
+    // Diet filter: Recipes must match all selected diets
     if (dietFilters.length > 0) {
-      dietMatch = dietFilters.some((diet) => recipe.diets.includes(diet))
+      dietMatch = dietFilters.every((diet) => recipe.diets.includes(diet))
+    } else {
+      dietMatch = true // If no diet is selected, all recipes are included
     }
     return timeMatch && ingredientMatch && cuisineMatch && dietMatch
   })
   // Update the UI with the filtered recipes
+  sortRecipes(
+    document
+      .querySelector('[data-filter-type="sort"] .selected-option')
+      .textContent.trim()
+  ) // call the sorting function here, to make the filtering and the sorting work together.
   updateRecipeList(filteredRecipes)
 }
 
@@ -287,6 +327,8 @@ const toggleDiet = (event) => {
   }
   // Remove the diet from the list
   else {
+    // Mark as false when unmarking
+    option.dataset.selected = "false"
     dietFilters = dietFilters.filter((item) => item !== diet) // Remove diet from the dietFilters list
   }
 
@@ -306,7 +348,7 @@ const updateRecipeList = (filteredRecipes) => {
 
   // Check if there are no recipes to display
   if (!filteredRecipes || filteredRecipes.length === 0) {
-    recipeGrid.innerHTML = "<p>No recipes found.</p>"
+    recipeGrid.innerHTML = `<p>No recipes found.</p>`
     return
   }
 
@@ -325,8 +367,9 @@ const updateRecipeList = (filteredRecipes) => {
     <h3>${recipe.title}</h3>
     <p><b>Cuisine:</b> ${recipe.cuisine}</p>
     <p><b>Diet:</b> ${recipe.diets.join(", ")}</p>
-    <p><b>Time:</b> ${recipe.readyInMinutes}</p>
+    <p><b>Time:</b> ${recipe.readyInMinutes} min </p>
     <p><b>Servings:</b> ${recipe.servings}</p>
+    <hr>
     <p><b>Ingredients:</b></p>
     <ul>
     ${ingredientsHTML}
@@ -352,7 +395,7 @@ const getSortOrder = () => {
   const sortOrder = document
     .querySelector('[data-filter-type="sort"] .selected-option')
     .textContent.trim()
-  console.log("Selected sort order:", sortOrder) // Test it
+  console.log("Selected sort order:", sortOrder)
 
   sortRecipes(sortOrder)
 }
@@ -361,15 +404,7 @@ const sortRecipes = (order) => {
   console.log("Sorting order:", order)
 
   // Get all the current recipes in the UI
-  let currentRecipes = [...document.querySelectorAll(".recipe-card")].map(
-    (card) => {
-      return recipes.find(
-        (recipe) => recipe.title === card.querySelector("h3").textContent
-      )
-    }
-  )
-
-  let sortedRecipes = [...currentRecipes]
+  let sortedRecipes = [...filteredRecipes]
 
   if (order === "Ascending") {
     sortedRecipes.sort((a, b) => a.readyInMinutes - b.readyInMinutes)
@@ -382,6 +417,9 @@ const sortRecipes = (order) => {
 }
 
 const resetFilters = () => {
+  // Reset the filtered recipes to the original list
+  filteredRecipes = [...recipes]
+
   // Close open dropdowns
   document.querySelectorAll(".custom-select").forEach((select) => {
     select.classList.remove("active")
@@ -415,7 +453,7 @@ const resetFilters = () => {
 // EVENT LISTENERS
 // (only add them once!)
 document.addEventListener("DOMContentLoaded", () => {
-  updateRecipeList(recipes) // Loads all recipes at the start
+  updateRecipeList(filteredRecipes) // Loads all recipes at the start
 })
 
 document.getElementById("random-button").addEventListener("click", () => {
