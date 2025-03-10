@@ -195,6 +195,30 @@ let filteredRecipes = [...recipes]
 
 // FUNCTIONS
 
+const capitalizeWords = (str) => {
+  return str
+    .split(" ") // Divide the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" ") // Put the words back together again
+}
+
+const formatRecipes = (recipes) => {
+  return recipes.map((recipe) => ({
+    ...recipe,
+    title: capitalizeWords(recipe.title),
+    cuisine: capitalizeWords(recipe.cuisine),
+    diets: recipe.diets.map((diet) => capitalizeWords(diet)),
+    ingredients: recipe.ingredients.map((ingredient) =>
+      capitalizeWords(ingredient)
+    )
+  }))
+}
+
+filteredRecipes = formatRecipes(filteredRecipes)
+
+// Formatera recepten direkt vid sidan laddas
+filteredRecipes = formatRecipes(filteredRecipes)
+
 const toggleDropdown = (event) => {
   event.stopPropagation() // Prevent the dropdown from closing when clicking on the dropdown itself
 
@@ -313,7 +337,8 @@ const filterRecipes = () => {
     document
       .querySelector('[data-filter-type="sort"] .selected-option')
       .textContent.trim()
-  ) // call the sorting function here, to make the filtering and the sorting work together.
+  )
+  filteredRecipes = formatRecipes(filteredRecipes)
   updateRecipeList(filteredRecipes)
 }
 
@@ -418,7 +443,8 @@ const sortRecipes = (order) => {
 
 const resetFilters = () => {
   // Reset the filtered recipes to the original list
-  filteredRecipes = [...recipes]
+  filteredRecipes = formatRecipes([...recipes])
+  updateRecipeList(filteredRecipes)
 
   // Close open dropdowns
   document.querySelectorAll(".custom-select").forEach((select) => {
@@ -454,6 +480,18 @@ const resetFilters = () => {
 // (only add them once!)
 document.addEventListener("DOMContentLoaded", () => {
   updateRecipeList(filteredRecipes) // Loads all recipes at the start
+})
+
+document.querySelectorAll(".recipe-card").forEach((card) => {
+  card.addEventListener("mouseenter", () => {
+    card.style.border = "2px solid #0018a4"
+    card.style.boxShadow = "0px 0px 30px 0px rgba(0, 24, 164, 0.2)"
+  })
+
+  card.addEventListener("mouseleave", () => {
+    card.style.border = "1px solid #e9e9e9"
+    card.style.boxShadow = "none"
+  })
 })
 
 document.getElementById("random-button").addEventListener("click", () => {
