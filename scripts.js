@@ -214,9 +214,7 @@ const formatRecipes = (recipes) => {
   }))
 }
 
-filteredRecipes = formatRecipes(filteredRecipes)
-
-// Formatera recepten direkt vid sidan laddas
+// Format the recipes directly when the page loads
 filteredRecipes = formatRecipes(filteredRecipes)
 
 const toggleDropdown = (event) => {
@@ -326,7 +324,9 @@ const filterRecipes = () => {
 
     // Diet filter: Recipes must match all selected diets
     if (dietFilters.length > 0) {
-      dietMatch = dietFilters.every((diet) => recipe.diets.includes(diet))
+      dietMatch = dietFilters.every((diet) =>
+        recipe.diets.map((d) => d.toLowerCase()).includes(diet.toLowerCase())
+      )
     } else {
       dietMatch = true // If no diet is selected, all recipes are included
     }
@@ -360,7 +360,9 @@ const toggleDiet = (event) => {
   // Update the text in the dropdown heading
   const dropdown = option.closest(".custom-select")
   const selectedText =
-    dietFilters.length > 0 ? dietFilters.join(", ") : "All diets"
+    dietFilters.length > 0
+      ? dietFilters.map((d) => capitalizeWords(d)).join(", ")
+      : "All diets"
   dropdown.querySelector(".selected-option").textContent = selectedText
 
   filterRecipes()
