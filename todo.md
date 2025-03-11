@@ -1,11 +1,9 @@
 To do:
-[x] Create random recipe function
-[x] Create a button to clear the filters
-[x] Create sort function (Ascending / Descending)
-[x] Fix design of recipe-card (h3 etc)
-[x] Message for when there are no recipes
-[x] Add a button to reset the filters
-[] Add API (690ac6592da546bc9d81f64e827555ff)
+[x] Add API
+[x] Fetch real recipe data from Spoonacular's recipes/random endpoint
+[x] Display dynamic recipe cards based on the API data
+[] Adapt filtering & sorting to match the API response format
+[] Show a useful message to the user in case the daily quota has been reached
 
 Bonuses:
 [] Change the diet dropdown to multi select tick boxes

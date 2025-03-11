@@ -1,11 +1,35 @@
-// Fetch the recipe data from the API
+// DOM SELECTORS
+
+const recipeGrid = document.getElementById("recipe-grid")
+const resetFilter = document.getElementById("reset-filter")
+
+// GLOBAL VARIABLES
 const URL =
   "https://api.spoonacular.com/recipes/random?apiKey=690ac6592da546bc9d81f64e827555ff&number=8"
 
-let recipes = [] // Empty array to store the fetched recipes
+// Empty array to store the fetched recipes
+let recipes = []
+
+// Total number of recipes fetched
+let totalRecipesFetched =
+  parseInt(localStorage.getItem("totalRecipesFetched")) || 0
+
+// List for chosen diets
+let dietFilters = []
+
+// Global variable to keep the filtered recipes
+let filteredRecipes = [...recipes]
+
+// FUNCTIONS
+
+// Fetch recipes from the Spoonacular API
 fetch(URL)
   .then((response) => response.json()) // Convert the response to JSON
   .then((data) => {
+    // Keep track of the number of fetched recipes
+    totalRecipesFetched += data.recipes.length // Update the counter
+    localStorage.setItem("totalRecipesFetched", totalRecipesFetched) // Save in localStorage
+    console.log("Total recipes fetched today:", totalRecipesFetched) // Check the value
     // Store the fetched recipes in the recipes array
     recipes = data.recipes.map((recipe) => {
       return {
@@ -16,7 +40,7 @@ fetch(URL)
         servings: recipe.servings,
         sourceUrl: recipe.sourceUrl,
         diets: recipe.diets,
-        cuisine: recipe.cuisine,
+        cuisine: recipe.cuisine || "Unknown",
         ingredients: recipe.extendedIngredients.map(
           (ingredient) => ingredient.original
         ),
@@ -24,25 +48,38 @@ fetch(URL)
         popularity: recipe.spoonacularScore
       }
     })
-    updateRecipeList(recipes) // Update the UI with the fetched recipes
+    checkRecipeLimit() // Check if the recipe limit is reached
+    resetRecipeCountAtMidnight() // Reset the recipe count at midnight
+    updateRecipeList(formatRecipes(recipes)) // Update the UI with the fetched and formatted recipes
   })
   .catch((error) => {
     console.error("Error fetching data:", error)
+    recipeGrid.innerHTML =
+      "<p class='warning'>Failed to load recipes. Please try again later.</p>"
   })
 
-// DOM SELECTORS
+// Reset the recipe count at midnight
+const resetRecipeCountAtMidnight = () => {
+  const today = new Date().toISOString().split("T")[0] // Get today's date in YYYY-MM-DD format
+  const lastFetchDate = localStorage.getItem("lastFetchDate")
 
-const recipeGrid = document.getElementById("recipe-grid")
-const resetFilter = document.getElementById("reset-filter")
+  if (lastFetchDate !== today) {
+    localStorage.setItem("totalRecipesFetched", 0) // Reset the counter to 0
+    localStorage.setItem("lastFetchDate", today) // Update the date
+    console.log("New day detected, resetting recipe count!")
+  }
+}
 
-// GLOBAL VARIABLES
-// List for chosen diets
-let dietFilters = []
-
-// Global variable to keep the filtered recipes
-let filteredRecipes = [...recipes]
-
-// FUNCTIONS
+// Check if the recipe limit is reached
+const checkRecipeLimit = () => {
+  if (totalRecipesFetched >= 150) {
+    recipeGrid.insertAdjacentHTML(
+      "beforeend",
+      "<p class='warning'>Daily recipe limit reached!</p>"
+    )
+    console.log("Daily recipe limit reached!")
+  }
+}
 
 const capitalizeWords = (str) => {
   return str
