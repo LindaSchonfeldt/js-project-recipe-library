@@ -36,14 +36,18 @@ fetch(URL)
         id: recipe.id,
         title: recipe.title,
         image: recipe.image,
+        likes: recipe.aggregateLikes,
+        dishTypes: recipe.dishTypes,
         readyInMinutes: recipe.readyInMinutes,
         servings: recipe.servings,
         sourceUrl: recipe.sourceUrl,
-        diets: recipe.diets,
-        cuisine: recipe.cuisine || "Unknown",
-        ingredients: recipe.extendedIngredients.map(
-          (ingredient) => ingredient.original
-        ),
+        diets: Array.isArray(recipe.diets) ? recipe.diets : [],
+        cuisine: Array.isArray(recipe.cuisines)
+          ? recipe.cuisines[0]
+          : "Unknown",
+        ingredients: Array.isArray(recipe.extendedIngredients)
+          ? recipe.extendedIngredients.map((ingredient) => ingredient.original)
+          : [],
         pricePerServing: recipe.pricePerServing,
         popularity: recipe.spoonacularScore
       }
@@ -92,7 +96,10 @@ const formatRecipes = (recipes) => {
   return recipes.map((recipe) => ({
     ...recipe,
     title: capitalizeWords(recipe.title),
-    cuisine: capitalizeWords(recipe.cuisine),
+    cuisine:
+      Array.isArray(recipe.cuisines) && recipe.cuisines.length
+        ? capitalizeWords(recipe.cuisines.join(", "))
+        : "Unknown",
     diets: recipe.diets.map((diet) => capitalizeWords(diet)),
     ingredients: recipe.ingredients.map((ingredient) =>
       capitalizeWords(ingredient)
@@ -278,7 +285,8 @@ const updateRecipeList = (filteredRecipes) => {
     recipeCard.innerHTML = `
      <img src="${recipe.image}" alt="${recipe.title}">
     <h3>${recipe.title}</h3>
-    <p><b>Cuisine:</b> ${recipe.cuisine}</p>
+    <p><b>Likes:</b> ${recipe.aggregateLikes}</p>
+    <p><b>Cuisine:</b> ${recipe.cuisines}</p>
     <p><b>Diet:</b> ${recipe.diets.join(", ")}</p>
     <p><b>Time:</b> ${recipe.readyInMinutes} min </p>
     <p><b>Servings:</b> ${recipe.servings}</p>
@@ -290,6 +298,18 @@ const updateRecipeList = (filteredRecipes) => {
     `
     // Append the recipe card to the recipe grid
     recipeGrid.appendChild(recipeCard)
+
+    document.querySelectorAll(".recipe-card").forEach((card) => {
+      card.addEventListener("mouseenter", () => {
+        card.style.border = "2px solid #0018a4"
+        card.style.boxShadow = "0px 0px 30px 0px rgba(0, 24, 164, 0.2)"
+      })
+
+      card.addEventListener("mouseleave", () => {
+        card.style.border = "1px solid #e9e9e9"
+        card.style.boxShadow = "none"
+      })
+    })
   })
 }
 
@@ -319,10 +339,12 @@ const sortRecipes = (order) => {
   // Get all the current recipes in the UI
   let sortedRecipes = [...filteredRecipes]
 
-  if (order === "Ascending") {
-    sortedRecipes.sort((a, b) => a.readyInMinutes - b.readyInMinutes)
-  } else if (order === "Descending") {
-    sortedRecipes.sort((a, b) => b.readyInMinutes - a.readyInMinutes)
+  if (order === "Sort by time") {
+    sortedRecipes.sort(
+      (a, b) => (b.readyInMinutes || 0) - (a.readyInMinutes || 0)
+    )
+  } else if (order === "Sort by popularity") {
+    sortedRecipes.sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
   }
 
   // Update the UI with the sorted recipes
@@ -330,30 +352,42 @@ const sortRecipes = (order) => {
 }
 
 const resetFilters = () => {
-  // Reset the filtered recipes to the original list
+  // If they array is empty, the recipes are not loaded yet
+  if (!recipes.length) {
+    console.warn("Recipes not loaded yet. Reset delayed.")
+    return
+  }
+  // Reset the filtered recipes to all recipes
   filteredRecipes = formatRecipes([...recipes])
   updateRecipeList(filteredRecipes)
+
+  // Update the UI after a short delay
+  setTimeout(() => {
+    updateRecipeList(filteredRecipes)
+  }, 10)
 
   // Close open dropdowns
   document.querySelectorAll(".custom-select").forEach((select) => {
     select.classList.remove("active")
   })
 
-  document.querySelectorAll(".selected-option").forEach((option) => {
-    // Reset the text content of the dropdown heading, depending on the filter type
-    option.textContent =
-      option.closest(".custom-select").dataset.filterType === "diet"
-        ? "All diets"
-        : option.closest(".custom-select").dataset.filterType === "cuisine"
-        ? "All cuisines"
-        : option.closest(".custom-select").dataset.filterType === "time"
-        ? "All times"
-        : option.closest(".custom-select").dataset.filterType === "ingredients"
-        ? "All ingredients"
-        : "All"
-  })
+  document
+    .querySelectorAll(".custom-select .selected-option")
+    .forEach((option) => {
+      const filterType = option.closest(".custom-select").dataset.filterType
+      option.textContent =
+        filterType === "diet"
+          ? "All diets"
+          : filterType === "cuisine"
+          ? "All cuisines"
+          : filterType === "time"
+          ? "All times"
+          : filterType === "ingredients"
+          ? "All ingredients"
+          : "Choose an alternative"
+    })
+  // Reset the diet filters
   dietFilters = []
-
   // Reset the selected state of the diet options
   document
     .querySelectorAll('[data-filter-type="diet"] .option')
@@ -368,18 +402,6 @@ const resetFilters = () => {
 // (only add them once!)
 document.addEventListener("DOMContentLoaded", () => {
   updateRecipeList(filteredRecipes) // Loads all recipes at the start
-})
-
-document.querySelectorAll(".recipe-card").forEach((card) => {
-  card.addEventListener("mouseenter", () => {
-    card.style.border = "2px solid #0018a4"
-    card.style.boxShadow = "0px 0px 30px 0px rgba(0, 24, 164, 0.2)"
-  })
-
-  card.addEventListener("mouseleave", () => {
-    card.style.border = "1px solid #e9e9e9"
-    card.style.boxShadow = "none"
-  })
 })
 
 document.getElementById("random-button").addEventListener("click", () => {
