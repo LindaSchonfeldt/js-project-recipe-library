@@ -100,6 +100,7 @@ const formatRecipes = (recipes) => {
       Array.isArray(recipe.cuisines) && recipe.cuisines.length
         ? capitalizeWords(recipe.cuisines.join(", "))
         : "Unknown",
+    dishTypes: recipe.dishTypes.map((dishType) => capitalizeWords(dishType)),
     diets: recipe.diets.map((diet) => capitalizeWords(diet)),
     ingredients: recipe.ingredients.map((ingredient) =>
       capitalizeWords(ingredient)
@@ -157,6 +158,10 @@ const filterRecipes = () => {
     .querySelector('[data-filter-type="ingredients"] .selected-option')
     .textContent.trim()
 
+  const dishTypeFilter = document
+    .querySelector('[data-filter-type="dish-type"] .selected-option')
+    .textContent.trim()
+
   const cuisineFilter = document
     .querySelector('[data-filter-type="cuisine"] .selected-option')
     .textContent.trim()
@@ -177,22 +182,9 @@ const filterRecipes = () => {
     // Assume match unless proven otherwise
     let timeMatch = true
     let ingredientMatch = true
+    let dishTypeMatch = true
     let cuisineMatch = true
     let dietMatch = true
-
-    // Time filter
-    // Check if a specific time is selected, otherwise, all times are included
-    if (timeFilter !== "All times") {
-      if (timeFilter === "Under 15 min") {
-        timeMatch = recipe.readyInMinutes < 15
-      } else if (timeFilter === "15-30 min") {
-        timeMatch = recipe.readyInMinutes >= 15 && recipe.readyInMinutes <= 30
-      } else if (timeFilter === "31-60 min") {
-        timeMatch = recipe.readyInMinutes >= 31 && recipe.readyInMinutes <= 60
-      } else if (timeFilter === "Over 60 min") {
-        timeMatch = recipe.readyInMinutes > 60
-      }
-    }
 
     // Ingredient filter
     // Check if a specific number of ingredient is selected, otherwise, all number of ingredient are included
@@ -210,6 +202,33 @@ const filterRecipes = () => {
       }
     }
 
+    // Time filter
+    // Check if a specific time is selected, otherwise, all times are included
+    if (timeFilter !== "All times") {
+      if (timeFilter === "Under 15 min") {
+        timeMatch = recipe.readyInMinutes < 15
+      } else if (timeFilter === "15-30 min") {
+        timeMatch = recipe.readyInMinutes >= 15 && recipe.readyInMinutes <= 30
+      } else if (timeFilter === "31-60 min") {
+        timeMatch = recipe.readyInMinutes >= 31 && recipe.readyInMinutes <= 60
+      } else if (timeFilter === "Over 60 min") {
+        timeMatch = recipe.readyInMinutes > 60
+      }
+    }
+
+    // Dish types filter
+    if (dishTypeFilter !== "All dish types") {
+      dishTypeMatch = recipe.dishTypes.includes(dishTypeFilter)
+    } else if (dishTypeFilter === "Breakfast") {
+      dishTypeMatch = recipe.dishTypes.includes("breakfast")
+    } else if (dishTypeFilter === "Lunch") {
+      dishTypeMatch = recipe.dishTypes.includes("lunch")
+    } else if (dishTypeFilter === "Dinner") {
+      dishTypeMatch = recipe.dishTypes.includes("dinner")
+    } else if (dishTypeFilter === "Dessert") {
+      dishTypeMatch = recipe.dishTypes.includes("dessert")
+    }
+
     // Cuisine filter
     if (cuisineFilter !== "All cuisines") {
       cuisineMatch = recipe.cuisine === cuisineFilter
@@ -223,7 +242,9 @@ const filterRecipes = () => {
     } else {
       dietMatch = true // If no diet is selected, all recipes are included
     }
-    return timeMatch && ingredientMatch && cuisineMatch && dietMatch
+    return (
+      timeMatch && ingredientMatch && dishTypeMatch && cuisineMatch && dietMatch
+    )
   })
   // Update the UI with the filtered recipes
   sortRecipes(
@@ -286,6 +307,7 @@ const updateRecipeList = (filteredRecipes) => {
      <img src="${recipe.image}" alt="${recipe.title}">
     <h3>${recipe.title}</h3>
     <p><b>Likes:</b> ${recipe.aggregateLikes}</p>
+    <p><b>Dish type:</b> ${recipe.dishTypes.join(", ")}</p>
     <p><b>Cuisine:</b> ${recipe.cuisines}</p>
     <p><b>Diet:</b> ${recipe.diets.join(", ")}</p>
     <p><b>Time:</b> ${recipe.readyInMinutes} min </p>

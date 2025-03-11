@@ -69,6 +69,27 @@
         </div>
 
         <div class="filters">
+          <h2>Filter on dish types</h2>
+          <div class="custom-select" data-filter-type="dish-types">
+            <div class="select-box blue" onclick="toggleDropdown(event)">
+              <span class="selected-option">All dish types</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container blue">
+              <div class="option" onclick="selectedOption(event)">
+                All dish types
+              </div>
+              <div class="option" onclick="selectedOption(event)">
+                Breakfast
+              </div>
+              <div class="option" onclick="selectedOption(event)">Lunch</div>
+              <div class="option" onclick="selectedOption(event)">Dinner</div>
+              <div class="option" onclick="selectedOption(event)">Dessert</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters">
           <h2>Filter on cuisine</h2>
           <div class="custom-select" data-filter-type="cuisine">
             <div class="select-box blue" onclick="toggleDropdown(event)">
