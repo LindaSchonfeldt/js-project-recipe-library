@@ -1,13 +1,18 @@
 To do:
-[x] Add API
+[x] Connect the API
 [x] Fetch real recipe data from Spoonacular's recipes/random endpoint
 [x] Display dynamic recipe cards based on the API data
-[] Adapt filtering & sorting to match the API response format
+[x] Adapt filtering & sorting to match the API response format
 [] Show a useful message to the user in case the daily quota has been reached
+
+Stretch goals:
 [x] Connect the filter options to the recipe cards
-[] Add more filtering options for dishType
+[x] Implement local storage caching to reduce API requests
+[] Show a loading state while fetching data
+[] Add search field (Allow users to search for specific recipe names or ingredients)
+[] Allow users to save/like recipes and store them in local storage. This includes adding a heart button to the recipe card and adding a "View favourites" button that only shows favourite recipes.
+[] Implement pagination for large results or infinite scrolling (e.g. fetching more recipes when the user has reached the bottom)
 
 Bonuses:
-[] Add search field
 [] Change the diet dropdown to multi select tick boxes
 [] Move the eventlisteners for the select-box and option to the script-file
