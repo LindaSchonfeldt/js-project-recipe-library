@@ -9,7 +9,7 @@ Stretch goals:
 [x] Connect the filter options to the recipe cards
 [x] Implement local storage caching to reduce API requests
 [] Show a loading state while fetching data
-[] Add search field (Allow users to search for specific recipe names or ingredients)
+[x] Add search field (Allow users to search for specific recipe names or ingredients)
 [] Allow users to save/like recipes and store them in local storage. This includes adding a heart button to the recipe card and adding a "View favourites" button that only shows favourite recipes.
 [] Implement pagination for large results or infinite scrolling (e.g. fetching more recipes when the user has reached the bottom)
 

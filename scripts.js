@@ -217,12 +217,16 @@ const searchRecipes = () => {
   let dataToSearch = filteredRecipes.length > 0 ? filteredRecipes : recipes
 
   if (!searchInput) {
-    updateRecipeList(recipes)
+    updateRecipeList(recipes) // Visa alla recept igen
     return
   }
 
-  let searchResults = dataToSearch.filter((recipe) =>
-    recipe.title.toLowerCase().includes(searchInput)
+  let searchResults = dataToSearch.filter(
+    (recipe) =>
+      recipe.title.toLowerCase().includes(searchInput) ||
+      recipe.ingredients.some((ingredient) =>
+        ingredient.toLowerCase().includes(searchInput)
+      )
   )
 
   updateRecipeList(searchResults)
