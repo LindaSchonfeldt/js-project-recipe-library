@@ -37,7 +37,7 @@ fetch(URL)
         title: recipe.title,
         image: recipe.image,
         likes: recipe.aggregateLikes,
-        dishTypes: recipe.dishTypes,
+        dishTypes: Array.isArray(recipe.dishTypes) ? recipe.dishTypes : [],
         readyInMinutes: recipe.readyInMinutes,
         servings: recipe.servings,
         sourceUrl: recipe.sourceUrl,
@@ -52,9 +52,9 @@ fetch(URL)
         popularity: recipe.spoonacularScore
       }
     })
+    recipes = formatRecipes(recipes) // Format the recipes
     checkRecipeLimit() // Check if the recipe limit is reached
-    resetRecipeCountAtMidnight() // Reset the recipe count at midnight
-    updateRecipeList(formatRecipes(recipes)) // Update the UI with the fetched and formatted recipes
+    updateRecipeList(formatRecipes(filteredRecipes)) // Update the UI with the fetched and formatted recipes
   })
   .catch((error) => {
     console.error("Error fetching data:", error)
@@ -76,7 +76,7 @@ const resetRecipeCountAtMidnight = () => {
 
 // Check if the recipe limit is reached
 const checkRecipeLimit = () => {
-  if (totalRecipesFetched >= 150) {
+  if (totalRecipesFetched >= 300) {
     recipeGrid.insertAdjacentHTML(
       "beforeend",
       "<p class='warning'>Daily recipe limit reached!</p>"
@@ -97,8 +97,8 @@ const formatRecipes = (recipes) => {
     ...recipe,
     title: capitalizeWords(recipe.title),
     cuisine:
-      Array.isArray(recipe.cuisines) && recipe.cuisines.length
-        ? capitalizeWords(recipe.cuisines.join(", "))
+      Array.isArray(recipe.cuisine) && recipe.cuisine.length
+        ? capitalizeWords(recipe.cuisine.join(", "))
         : "Unknown",
     dishTypes: recipe.dishTypes.map((dishType) => capitalizeWords(dishType)),
     diets: recipe.diets.map((diet) => capitalizeWords(diet)),
@@ -107,9 +107,6 @@ const formatRecipes = (recipes) => {
     )
   }))
 }
-
-// Format the recipes directly when the page loads
-filteredRecipes = formatRecipes(filteredRecipes)
 
 const toggleDropdown = (event) => {
   event.stopPropagation() // Prevent the dropdown from closing when clicking on the dropdown itself
@@ -146,6 +143,8 @@ const selectedOption = (event) => {
   } else {
     filterRecipes()
   }
+
+  console.log("Filter type: ", dropdown.dataset.filterType)
 }
 
 const filterRecipes = () => {
@@ -193,10 +192,10 @@ const filterRecipes = () => {
         ingredientMatch = recipe.ingredients.length < 5
       } else if (ingredientFilter === "5-10 ingredients") {
         ingredientMatch =
-          recipe.ingredients.length >= 5 && recipe.ingredients.length <= 10
+          recipe.ingredients.length > 4 && recipe.ingredients.length < 11
       } else if (ingredientFilter === "11-15 ingredients") {
         ingredientMatch =
-          recipe.ingredients.length >= 11 && recipe.ingredients.length <= 15
+          recipe.ingredients.length > 10 && recipe.ingredients.length < 16
       } else if (ingredientFilter === "Over 15 ingredients") {
         ingredientMatch = recipe.ingredients.length > 15
       }
@@ -205,33 +204,29 @@ const filterRecipes = () => {
     // Time filter
     // Check if a specific time is selected, otherwise, all times are included
     if (timeFilter !== "All times") {
-      if (timeFilter === "Under 15 min") {
-        timeMatch = recipe.readyInMinutes < 15
-      } else if (timeFilter === "15-30 min") {
-        timeMatch = recipe.readyInMinutes >= 15 && recipe.readyInMinutes <= 30
-      } else if (timeFilter === "31-60 min") {
-        timeMatch = recipe.readyInMinutes >= 31 && recipe.readyInMinutes <= 60
-      } else if (timeFilter === "Over 60 min") {
-        timeMatch = recipe.readyInMinutes > 60
+      if (timeFilter === "Under 30 min") {
+        timeMatch = recipe.readyInMinutes < 30
+      } else if (timeFilter === "30-60 min") {
+        timeMatch = recipe.readyInMinutes >= 30 && recipe.readyInMinutes <= 60
+      } else if (timeFilter === "61-90 min") {
+        timeMatch = recipe.readyInMinutes >= 61 && recipe.readyInMinutes <= 90
+      } else if (timeFilter === "Over 90 min") {
+        timeMatch = recipe.readyInMinutes > 90
       }
     }
 
     // Dish types filter
     if (dishTypeFilter !== "All dish types") {
-      dishTypeMatch = recipe.dishTypes.includes(dishTypeFilter)
-    } else if (dishTypeFilter === "Breakfast") {
-      dishTypeMatch = recipe.dishTypes.includes("breakfast")
-    } else if (dishTypeFilter === "Lunch") {
-      dishTypeMatch = recipe.dishTypes.includes("lunch")
-    } else if (dishTypeFilter === "Dinner") {
-      dishTypeMatch = recipe.dishTypes.includes("dinner")
-    } else if (dishTypeFilter === "Dessert") {
-      dishTypeMatch = recipe.dishTypes.includes("dessert")
+      dishTypeMatch = recipe.dishTypes
+        .map((dt) => dt.toLowerCase())
+        .includes(dishTypeFilter.toLowerCase())
     }
 
     // Cuisine filter
     if (cuisineFilter !== "All cuisines") {
-      cuisineMatch = recipe.cuisine === cuisineFilter
+      cuisineMatch = Array.isArray(recipe.cuisine)
+        ? recipe.cuisine.includes(cuisineFilter)
+        : recipe.cuisine === cuisineFilter
     }
 
     // Diet filter: Recipes must match all selected diets
@@ -240,7 +235,7 @@ const filterRecipes = () => {
         recipe.diets.map((d) => d.toLowerCase()).includes(diet.toLowerCase())
       )
     } else {
-      dietMatch = true // If no diet is selected, all recipes are included
+      dietMatch = true
     }
     return (
       timeMatch && ingredientMatch && dishTypeMatch && cuisineMatch && dietMatch
@@ -252,7 +247,6 @@ const filterRecipes = () => {
       .querySelector('[data-filter-type="sort"] .selected-option')
       .textContent.trim()
   )
-  filteredRecipes = formatRecipes(filteredRecipes)
   updateRecipeList(filteredRecipes)
 }
 
@@ -380,7 +374,7 @@ const resetFilters = () => {
     return
   }
   // Reset the filtered recipes to all recipes
-  filteredRecipes = formatRecipes([...recipes])
+  filteredRecipes = [...recipes]
   updateRecipeList(filteredRecipes)
 
   // Update the UI after a short delay
@@ -402,6 +396,8 @@ const resetFilters = () => {
           ? "All diets"
           : filterType === "cuisine"
           ? "All cuisines"
+          : filterType === "dish-type"
+          ? "All dish types"
           : filterType === "time"
           ? "All times"
           : filterType === "ingredients"
@@ -416,7 +412,6 @@ const resetFilters = () => {
     .forEach((option) => {
       option.dataset.selected = "false"
     })
-
   filterRecipes()
 }
 
