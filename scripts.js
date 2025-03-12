@@ -45,6 +45,8 @@ const updateRecipeList = (filteredRecipes) => {
     return
   }
 
+  let likedRecipes = JSON.parse(localStorage.getItem("likes")) || []
+
   filteredRecipes.forEach((recipe) => {
     const recipeCard = document.createElement("div")
     recipeCard.classList.add("recipe-card")
@@ -56,7 +58,12 @@ const updateRecipeList = (filteredRecipes) => {
 
     // Add recipe details inside the div
     recipeCard.innerHTML = `
-     <img src="${recipe.image}" alt="${recipe.title}">
+    <button class="like-button" data-id="${
+      recipe.id
+    }" onclick="toggleLike(event)">
+        <img src="/assets/heart.svg" alt="Like">
+      </button>
+    <img src="${recipe.image}" alt="${recipe.title}">
     <h3>${recipe.title}</h3>
     <p><b>Likes:</b> ${recipe.aggregateLikes}</p>
     <p><b>Dish type:</b> ${recipe.dishTypes.join(", ")}</p>
@@ -70,6 +77,11 @@ const updateRecipeList = (filteredRecipes) => {
     ${ingredientsHTML}
     </ul>
     `
+    // If a recipe is in the likedRecipes list add the class "liked" to it
+    if (likedRecipes.includes(recipe.id)) {
+      recipeCard.querySelector(".like-button").classList.add("liked")
+    }
+
     // Append the recipe card to the recipe grid
     recipeGrid.appendChild(recipeCard)
 
@@ -95,7 +107,10 @@ if (recipes.length > 0) {
   updateRecipeList(recipes) // Used saved recipes from localStorage if there are any
 } else {
   fetch(URL)
-    .then((response) => response.json()) // Convert the response to JSON
+    .then((response) => {
+      console.log("Response from API:", response) // Debug: Log the response
+      return response.json() // Convert the response to JSON
+    })
     .then((data) => {
       // Keep track of the number of fetched recipes
       totalRecipesFetched += data.recipes.length // Update the counter
@@ -150,7 +165,7 @@ const fetchNewRecipes = () => {
       }
 
       recipes = formatRecipes([...recipes, ...data.recipes]) // Add new recipes
-      localStorage.setItem("recipes", JSON.stringify(recipes)) // Save them locallt
+      localStorage.setItem("recipes", JSON.stringify(recipes)) // Save them locally
       filteredRecipes = [...recipes] // Update the filtered recipes
       updateRecipeList(filteredRecipes) // Update the UI
 
@@ -228,8 +243,25 @@ const searchRecipes = () => {
         ingredient.toLowerCase().includes(searchInput)
       )
   )
-
   updateRecipeList(searchResults)
+}
+
+const toggleLike = (event) => {
+  const likeButton = event.currentTarget
+  const recipeId = likeButton.dataset.id
+
+  let likedRecipes = JSON.parse(localStorage.getItem("likes")) || []
+
+  if (likedRecipes.includes(recipeId)) {
+    likedRecipes = likedRecipes.filter((id) => id !== recipeId) // Remove if already liked
+    likeButton.classList.remove("liked")
+  } else {
+    likedRecipes.push(recipeId) // Add if not liked
+    likeButton.classList.add("liked")
+  }
+
+  localStorage.setItem("likes", JSON.stringify(likedRecipes))
+  console.log("Updated liked recipes:", likedRecipes)
 }
 
 const toggleDropdown = (event) => {

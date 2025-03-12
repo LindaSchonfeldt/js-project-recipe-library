@@ -171,6 +171,22 @@ h2 {
   gap: 0.3rem;
 }
 
+.like-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border: #fff solid 2px;
+  cursor: pointer;
+  height: 3rem;
+  width: 3rem;
+}
+
+.like-button:hover {
+  background-color: #ccffe2;
+  border: #ccffe2 solid 2px;
+}
+
 .recipe-card {
   display: flex;
   flex-direction: column;
@@ -278,6 +294,10 @@ li {
     margin: 0 auto; /* Centers the grid */
     width: 100%;
   }
+}
+
+.hidden {
+  display: none;
 }
 
 .recipe-card {
