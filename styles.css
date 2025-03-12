@@ -38,7 +38,7 @@ main {
 button {
   font-family: "Futura", sans-serif;
   font-size: 16px;
-  height: 3rem;
+  height: 2.5rem;
   padding: 0.5rem 1rem;
   color: #fff;
   background-color: #0018a4;
@@ -154,6 +154,22 @@ h2 {
 
 .custom-select.active .options-container {
   display: flex;
+}
+
+#button-section {
+  flex-wrap: wrap;
+}
+
+#favorites-button {
+  align-self: flex-end;
+  background-color: #ff6589;
+  border: #ff6589 solid 2px;
+  margin: 0.5rem 0 0 0;
+}
+
+#favorites-button:hover {
+  background-color: #ffecea;
+  border: #ff6589 solid 2px;
 }
 
 #recipe-section {
