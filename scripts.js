@@ -176,7 +176,6 @@ const fetchNewRecipes = () => {
       console.log(recipes)
       localStorage.setItem("recipes", JSON.stringify(recipes)) // Save them locally
       filteredRecipes = [...recipes] // Update the filtered recipes
-      //updateRecipeList(filteredRecipes) // Update the UI
       updatePaginatedRecipes()
       resetRecipeCountAtMidnight()
       checkRecipeLimit()
@@ -184,11 +183,21 @@ const fetchNewRecipes = () => {
     })
     .catch((error) => {
       console.error("Error fetching new recipes:", error)
+
+      if (
+        error instanceof DOMException &&
+        error.name === "QuotaExceededError"
+      ) {
+        console.log("LocalStorage quota exceeded!")
+        recipeGrid.innerHTML = `<h3>LocalStorage is full! Please clear some space.</h3>`
+      } else if (error.toString().toLowerCase().includes("quota")) {
+        console.log("API Quota exhausted!")
+        recipeGrid.innerHTML = `<h3>API Quota exhausted! Daily recipe limit reached!</h3>`
+      }
     })
 }
 
-// Reset the recipe count at midnight
-const resetRecipeCountAtMidnight = () => {
+/* const resetRecipeCountAtMidnight = () => {
   const today = new Date().toISOString().split("T")[0] // Get today's date in YYYY-MM-DD format
   const lastFetchDate = localStorage.getItem("lastFetchDate")
 
@@ -201,7 +210,7 @@ const resetRecipeCountAtMidnight = () => {
 
 // Check if the recipe limit is reached
 const checkRecipeLimit = () => {
-  if (totalRecipesFetched >= 300) {
+  if (totalRecipesFetched >= 400) {
     recipeGrid.insertAdjacentHTML(
       "beforeend",
       "<p class='warning'>Daily recipe limit reached!</p>"
@@ -209,7 +218,7 @@ const checkRecipeLimit = () => {
     console.log("Daily recipe limit reached!")
     recipeGrid.innerHTML(` API Quota exhausted! Daily recipe limit reached! `)
   }
-}
+} */
 
 const capitalizeWords = (str) => {
   return str
