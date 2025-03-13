@@ -49,8 +49,6 @@ const updateRecipeList = (filteredRecipes) => {
     return
   }
 
-  let likedRecipes = JSON.parse(localStorage.getItem("likes")) || []
-
   filteredRecipes.forEach((recipe) => {
     const recipeCard = document.createElement("div")
     recipeCard.classList.add("recipe-card")
@@ -66,16 +64,10 @@ const updateRecipeList = (filteredRecipes) => {
 
     // Add recipe details inside the div
     recipeCard.innerHTML = `
-    <button class="like-button" data-id="${
-      recipe.id
-    }" onclick="toggleLike(event)">
-        <img src="/assets/heart.svg" alt="Like">
-      </button>
     <img src="${recipe.image}" alt="${recipe.title}">
     <h3>${recipe.title}</h3>
-    <p><b>Likes:</b> ${recipe.aggregateLikes}</p>
     <p><b>Dish type:</b> ${recipe.dishTypes.join(", ")}</p>
-    <p><b>Cuisine:</b> ${recipe.cuisines}</p>
+    <p><b>Cuisine:</b> ${recipe.cuisine}</p>
     <p><b>Diet:</b> ${recipe.diets.join(", ")}</p>
     <p><b>Time:</b> ${recipe.readyInMinutes} min </p>
     <p><b>Servings:</b> ${recipe.servings}</p>
@@ -85,14 +77,11 @@ const updateRecipeList = (filteredRecipes) => {
     ${ingredientsHTML}
     </ul>
     `
-    // If a recipe is in the likedRecipes list add the class "liked" to it
-    if (likedRecipes.includes(recipe.id)) {
-      recipeCard.querySelector(".like-button").classList.add("liked")
-    }
 
     // Append the recipe card to the recipe grid
     recipeGrid.appendChild(recipeCard)
 
+    // Create hover effect in here to make it work since the card is created using JS
     document.querySelectorAll(".recipe-card").forEach((card) => {
       card.addEventListener("mouseenter", () => {
         card.style.border = "2px solid #0018a4"
@@ -110,56 +99,57 @@ const updateRecipeList = (filteredRecipes) => {
 // Load recipes from localStorage
 recipes = loadRecipesFromLocalStorage()
 
-// Fetch recipes from the Spoonacular API
-if (recipes.length > 0) {
-  updateRecipeList(recipes) // Used saved recipes from localStorage if there are any
-} else {
-  fetch(URL)
-    .then((response) => {
-      console.log("Response from API:", response) // Debug: Log the response
-      return response.json() // Convert the response to JSON
-    })
-    .then((data) => {
-      // Keep track of the number of fetched recipes
-      totalRecipesFetched += data.recipes.length // Update the counter
-      console.log("Total recipes fetched today:", totalRecipesFetched) // Check the value
-      // Store the fetched recipes in the recipes array
-      recipes = data.recipes.map((recipe) => {
-        return {
-          id: recipe.id,
-          title: recipe.title,
-          image: recipe.image,
-          likes: recipe.aggregateLikes,
-          dishTypes: Array.isArray(recipe.dishTypes) ? recipe.dishTypes : [],
-          readyInMinutes: recipe.readyInMinutes,
-          servings: recipe.servings,
-          sourceUrl: recipe.sourceUrl,
-          diets: Array.isArray(recipe.diets) ? recipe.diets : [],
-          cuisine: Array.isArray(recipe.cuisines)
-            ? recipe.cuisines[0]
-            : "Unknown",
-          ingredients: Array.isArray(recipe.extendedIngredients)
-            ? recipe.extendedIngredients.map(
-                (ingredient) => ingredient.original
-              )
-            : [],
-          popularity: recipe.spoonacularScore
-        }
+const fetchRecipes = () => {
+  // Fetch recipes from the Spoonacular API
+  if (recipes.length > 0) {
+    updateRecipeList(recipes) // Used saved recipes from localStorage if there are any
+  } else {
+    fetch(URL)
+      .then((response) => {
+        console.log("Response from API:", response) // Debug: Log the response
+        return response.json() // Convert the response to JSON
       })
-      console.log("Fetched recipes from API:", recipes) // Debug: Log the fetched recipes
-      saveRecipesToLocalStorage() // Save the recipes in localStorage
-      recipes = formatRecipes(recipes) // Format the recipes
-      filteredRecipes = [...recipes] // Update the filtered recipes
-      updateRecipeList(recipes) // Update the UI with the fetched recipes
-      resetRecipeCountAtMidnight() // Reset the recipe count at midnight
-      checkRecipeLimit() // Check if the recipe limit is reached
-    })
-    .catch((error) => {
-      console.error("Error fetching data:", error)
-      recipeGrid.innerHTML =
-        "<p class='warning'>Failed to load recipes. Please try again later.</p>"
-    })
+      .then((data) => {
+        // Keep track of the number of fetched recipes
+        totalRecipesFetched += data.recipes.length // Update the counter
+        console.log("Total recipes fetched today:", totalRecipesFetched) // Check the value
+        // Store the fetched recipes in the recipes array
+        recipes = data.recipes.map((recipe) => {
+          console.log("Cuisine data:", recipe.cuisines)
+          return {
+            id: recipe.id,
+            title: recipe.title,
+            image: recipe.image,
+            dishTypes: Array.isArray(recipe.dishTypes) ? recipe.dishTypes : [],
+            readyInMinutes: recipe.readyInMinutes,
+            servings: recipe.servings,
+            sourceUrl: recipe.sourceUrl,
+            diets: Array.isArray(recipe.diets) ? recipe.diets : [],
+            cuisine: Array.isArray(recipe.cuisines)
+              ? recipe.cuisines[0]
+              : "Unknown",
+            ingredients: Array.isArray(recipe.extendedIngredients)
+              ? recipe.extendedIngredients.map(
+                  (ingredient) => ingredient.original
+                )
+              : []
+          }
+        })
+        console.log("Fetched recipes from API:", recipes) // Debug: Log the fetched recipes
+        saveRecipesToLocalStorage() // Save the recipes in localStorage
+        recipes = formatRecipes(recipes) // Format the recipes
+        filteredRecipes = [...recipes] // Update the filtered recipes
+        updateRecipeList(recipes) // Update the UI with the fetched recipes
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error)
+        recipeGrid.innerHTML =
+          "<p class='warning'>Failed to load recipes. Please try again later.</p>"
+      })
+  }
 }
+
+fetchRecipes()
 
 const fetchNewRecipes = () => {
   fetch(URL)
@@ -177,8 +167,6 @@ const fetchNewRecipes = () => {
       localStorage.setItem("recipes", JSON.stringify(recipes)) // Save them locally
       filteredRecipes = [...recipes] // Update the filtered recipes
       updatePaginatedRecipes()
-      resetRecipeCountAtMidnight()
-      checkRecipeLimit()
       return recipes
     })
     .catch((error) => {
@@ -232,7 +220,7 @@ const formatRecipes = (recipes) => {
   return recipes.map((recipe) => ({
     ...recipe,
     title: recipe.title ? capitalizeWords(recipe.title) : "",
-    cuisine: recipe.cuisine ? capitalizeWords(recipe.cuisine) : "Unknown",
+    cuisine: recipe.cuisines ? capitalizeWords(recipe.cuisines) : "Unknown",
     dishTypes: Array.isArray(recipe.dishTypes)
       ? recipe.dishTypes.map((dishType) => capitalizeWords(dishType))
       : [],
@@ -258,11 +246,8 @@ const searchRecipes = () => {
 
   if (!searchInput) {
     // Apply other filters first (optional)
-    // This would integrate search with your existing filters
-    // baseRecipes = applyCurrentFilters(baseRecipes);
 
-    // If search is empty, just use the filtered recipes or all recipes
-    // Use whatever filters were already applied
+    // If search is empty, use the filtered recipes or all recipes
     filterRecipes()
     return
   }
@@ -281,24 +266,6 @@ const searchRecipes = () => {
   // Update filteredRecipes to maintain state
   filteredRecipes = searchResults
   updateRecipeList(searchResults)
-}
-
-const toggleLike = (event) => {
-  const likeButton = event.currentTarget
-  const recipeId = likeButton.dataset.id
-
-  let likedRecipes = JSON.parse(localStorage.getItem("likes")) || []
-
-  if (likedRecipes.includes(recipeId)) {
-    likedRecipes = likedRecipes.filter((id) => id !== recipeId) // Remove if already liked
-    likeButton.classList.remove("liked")
-  } else {
-    likedRecipes.push(recipeId) // Add if not liked
-    likeButton.classList.add("liked")
-  }
-
-  localStorage.setItem("likes", JSON.stringify(likedRecipes))
-  console.log("Updated liked recipes:", likedRecipes)
 }
 
 const toggleDropdown = (event) => {
@@ -369,7 +336,7 @@ const filterRecipes = () => {
   // Check if recipes exists
   if (!recipes || recipes.length === 0) {
     recipeGrid.innerHTML = "<p>No recipes found.</p>"
-    console.warn("No recipes available to filter")
+    console.warn("No recipes available to filter.")
     return
   }
 
@@ -444,7 +411,6 @@ const filterRecipes = () => {
       .querySelector('[data-filter-type="sort"] .selected-option')
       .textContent.trim()
   )
-  //updateRecipeList(filteredRecipes)
   updatePaginatedRecipes()
 }
 
@@ -520,12 +486,10 @@ const resetFilters = () => {
   }
   // Reset the filtered recipes to all recipes
   filteredRecipes = [...recipes]
-  //updateRecipeList(filteredRecipes)
   updatePaginatedRecipes()
 
   // Update the UI after a short delay
   setTimeout(() => {
-    //updateRecipeList(filteredRecipes)
     updatePaginatedRecipes()
   }, 10)
 
@@ -560,34 +524,6 @@ const resetFilters = () => {
       option.dataset.selected = "false"
     })
   filterRecipes()
-}
-
-const showLikedRecipes = () => {
-  // Get liked recipe IDs from localStorage (with fallback to empty array)
-  const likedRecipes = JSON.parse(localStorage.getItem("likes")) || []
-
-  // For debugging - check what we're getting from localStorage
-  console.log("Liked recipe IDs:", likedRecipes)
-
-  // Determine which recipe source to use
-  const recipeSource = filteredRecipes.length > 0 ? filteredRecipes : recipes
-  console.log("Recipe source count:", recipeSource.length)
-
-  // Filter to only liked recipes
-  const favoriteRecipes = recipeSource.filter((recipe) =>
-    likedRecipes.includes(recipe.id)
-  )
-  console.log("Favorite recipes found:", favoriteRecipes.length)
-
-  // Update the heading
-  recipeGrid.innerHTML = `<h2>Your favorite recipes (${favoriteRecipes.length}):</h2>`
-
-  // Update the recipe display
-  if (favoriteRecipes.length === 0) {
-    recipeGrid.innerHTML += `<p>You haven't liked any recipes yet.</p>`
-  } else {
-    updateRecipeList(favoriteRecipes)
-  }
 }
 
 const updatePaginationButtons = () => {
@@ -641,7 +577,6 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(URL) // ✅ Make sure to fetch the recipes if they are not loaded yet
   } else {
     filteredRecipes = [...recipes]
-    //updateRecipeList(filteredRecipes)
     updatePaginatedRecipes()
   }
 })
@@ -653,7 +588,3 @@ document.getElementById("random-button").addEventListener("click", () => {
 })
 
 document.getElementById("reset-filter").addEventListener("click", resetFilters)
-
-document
-  .getElementById("favorites-button")
-  .addEventListener("click", showLikedRecipes)

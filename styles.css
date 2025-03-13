@@ -10,13 +10,6 @@
   --text-color: #000;
 }
 
-/* Reset some default browser styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 /* Overall Grid Layout for the Page */
 body {
   display: grid;
@@ -120,6 +113,7 @@ h2 {
   font-size: 14px;
 }
 
+/* Dropdowns */
 .options-container {
   position: absolute;
   top: 100%;
@@ -160,18 +154,6 @@ h2 {
   flex-wrap: wrap;
 }
 
-#favorites-button {
-  align-self: flex-end;
-  background-color: #ff6589;
-  border: #ff6589 solid 2px;
-  margin: 0.5rem 0 0 0;
-}
-
-#favorites-button:hover {
-  background-color: #ffecea;
-  border: #ff6589 solid 2px;
-}
-
 #recipe-section {
   display: flex;
   flex-direction: column;
@@ -185,22 +167,6 @@ h2 {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.3rem;
-}
-
-.like-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #fff;
-  border: #fff solid 2px;
-  cursor: pointer;
-  height: 3rem;
-  width: 3rem;
-}
-
-.like-button:hover {
-  background-color: #ccffe2;
-  border: #ccffe2 solid 2px;
 }
 
 .recipe-card {
