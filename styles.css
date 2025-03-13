@@ -249,6 +249,28 @@ li {
   padding: 0.1rem;
 }
 
+#pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#pagination-controls button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  background-color: #0018a4;
+  color: white;
+  cursor: pointer;
+}
+
+#pagination-controls button:disabled {
+  background-color: lightgray;
+  cursor: default;
+}
+
 /* MEDIA QUERIES for enhanced grid layout on larger screens */
 @media (min-width: 768px) {
   body {

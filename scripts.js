@@ -5,7 +5,7 @@ const resetFilter = document.getElementById("reset-filter")
 
 // GLOBAL VARIABLES
 const URL =
-  "https://api.spoonacular.com/recipes/random?apiKey=690ac6592da546bc9d81f64e827555ff&number=10"
+  "https://api.spoonacular.com/recipes/random?apiKey=690ac6592da546bc9d81f64e827555ff&number=100"
 
 // Empty array to store the fetched recipes
 let recipes = []
@@ -19,6 +19,10 @@ let dietFilters = []
 
 // Global variable to keep the filtered recipes
 let filteredRecipes = [...recipes]
+
+//Pagination variables
+const recipesPerPage = 8
+let currentPage = 1
 
 // FUNCTIONS
 
@@ -51,7 +55,7 @@ const updateRecipeList = (filteredRecipes) => {
     const recipeCard = document.createElement("div")
     recipeCard.classList.add("recipe-card")
 
-    // Create a list of ingredients (ADDED)
+    // Create a list of ingredients
     if (!recipe.ingredients) {
       ingredientsHTML = `<li>Ingredients not available</li>`
     } else {
@@ -172,8 +176,8 @@ const fetchNewRecipes = () => {
       console.log(recipes)
       localStorage.setItem("recipes", JSON.stringify(recipes)) // Save them locally
       filteredRecipes = [...recipes] // Update the filtered recipes
-      updateRecipeList(filteredRecipes) // Update the UI
-
+      //updateRecipeList(filteredRecipes) // Update the UI
+      updatePaginatedRecipes()
       resetRecipeCountAtMidnight()
       checkRecipeLimit()
       return recipes
@@ -203,6 +207,7 @@ const checkRecipeLimit = () => {
       "<p class='warning'>Daily recipe limit reached!</p>"
     )
     console.log("Daily recipe limit reached!")
+    recipeGrid.innerHTML(` API Quota exhausted! Daily recipe limit reached! `)
   }
 }
 
@@ -214,18 +219,20 @@ const capitalizeWords = (str) => {
 }
 
 const formatRecipes = (recipes) => {
+  console.log("Formatting recipes...")
   return recipes.map((recipe) => ({
     ...recipe,
-    title: capitalizeWords(recipe.title),
-    cuisine:
-      Array.isArray(recipe.cuisine) && recipe.cuisine.length
-        ? capitalizeWords(recipe.cuisine.join(", "))
-        : "Unknown",
-    dishTypes: recipe.dishTypes.map((dishType) => capitalizeWords(dishType)),
-    diets: recipe.diets.map((diet) => capitalizeWords(diet)),
-    ingredients: recipe.ingredients.map((ingredient) =>
-      capitalizeWords(ingredient)
-    )
+    title: recipe.title ? capitalizeWords(recipe.title) : "",
+    cuisine: recipe.cuisine ? capitalizeWords(recipe.cuisine) : "Unknown",
+    dishTypes: Array.isArray(recipe.dishTypes)
+      ? recipe.dishTypes.map((dishType) => capitalizeWords(dishType))
+      : [],
+    diets: Array.isArray(recipe.diets)
+      ? recipe.diets.map((diet) => capitalizeWords(diet))
+      : [],
+    ingredients: Array.isArray(recipe.ingredients)
+      ? recipe.ingredients.map((ingredient) => capitalizeWords(ingredient))
+      : []
   }))
 }
 
@@ -235,20 +242,35 @@ const searchRecipes = () => {
     .value.trim()
     .toLowerCase()
 
-  let dataToSearch = filteredRecipes.length > 0 ? filteredRecipes : recipes
+  // Start with all recipes when searching from scratch
+  let baseRecipes = recipes
+
+  // In your search function, protect against undefined values
 
   if (!searchInput) {
-    updateRecipeList(recipes) // Visa alla recept igen
+    // Apply other filters first (optional)
+    // This would integrate search with your existing filters
+    // baseRecipes = applyCurrentFilters(baseRecipes);
+
+    // If search is empty, just use the filtered recipes or all recipes
+    // Use whatever filters were already applied
+    filterRecipes()
     return
   }
+
+  // Search within filtered recipes if they exist
+  let dataToSearch = filteredRecipes.length > 0 ? filteredRecipes : baseRecipes
 
   let searchResults = dataToSearch.filter(
     (recipe) =>
       recipe.title.toLowerCase().includes(searchInput) ||
-      recipe.ingredients.some((ingredient) =>
-        ingredient.toLowerCase().includes(searchInput)
-      )
+      (Array.isArray(recipe.ingredients) &&
+        recipe.ingredients.some((ingredient) =>
+          ingredient.toLowerCase().includes(searchInput)
+        ))
   )
+  // Update filteredRecipes to maintain state
+  filteredRecipes = searchResults
   updateRecipeList(searchResults)
 }
 
@@ -311,6 +333,9 @@ const selectedOption = (event) => {
 }
 
 const filterRecipes = () => {
+  // Reset to page 1 for each filter
+  currentPage = 1
+
   // Get selected filters
   const timeFilter = document
     .querySelector('[data-filter-type="time"] .selected-option')
@@ -410,7 +435,8 @@ const filterRecipes = () => {
       .querySelector('[data-filter-type="sort"] .selected-option')
       .textContent.trim()
   )
-  updateRecipeList(filteredRecipes)
+  //updateRecipeList(filteredRecipes)
+  updatePaginatedRecipes()
 }
 
 const toggleDiet = (event) => {
@@ -485,11 +511,13 @@ const resetFilters = () => {
   }
   // Reset the filtered recipes to all recipes
   filteredRecipes = [...recipes]
-  updateRecipeList(filteredRecipes)
+  //updateRecipeList(filteredRecipes)
+  updatePaginatedRecipes()
 
   // Update the UI after a short delay
   setTimeout(() => {
-    updateRecipeList(filteredRecipes)
+    //updateRecipeList(filteredRecipes)
+    updatePaginatedRecipes()
   }, 10)
 
   // Close open dropdowns
@@ -525,14 +553,87 @@ const resetFilters = () => {
   filterRecipes()
 }
 
+const showLikedRecipes = () => {
+  // Get liked recipe IDs from localStorage (with fallback to empty array)
+  const likedRecipes = JSON.parse(localStorage.getItem("likes")) || []
+
+  // For debugging - check what we're getting from localStorage
+  console.log("Liked recipe IDs:", likedRecipes)
+
+  // Determine which recipe source to use
+  const recipeSource = filteredRecipes.length > 0 ? filteredRecipes : recipes
+  console.log("Recipe source count:", recipeSource.length)
+
+  // Filter to only liked recipes
+  const favoriteRecipes = recipeSource.filter((recipe) =>
+    likedRecipes.includes(recipe.id)
+  )
+  console.log("Favorite recipes found:", favoriteRecipes.length)
+
+  // Update the heading
+  recipeGrid.innerHTML = `<h2>Your favorite recipes (${favoriteRecipes.length}):</h2>`
+
+  // Update the recipe display
+  if (favoriteRecipes.length === 0) {
+    recipeGrid.innerHTML += `<p>You haven't liked any recipes yet.</p>`
+  } else {
+    updateRecipeList(favoriteRecipes)
+  }
+}
+
+const updatePaginationButtons = () => {
+  document.getElementById(
+    "page-info"
+  ).textContent = `Page ${currentPage} of ${Math.ceil(
+    filteredRecipes.length / recipesPerPage
+  )}`
+
+  document.getElementById("prev-page").disabled = currentPage === 1
+  document.getElementById("next-page").disabled =
+    currentPage === Math.ceil(filteredRecipes.length / recipesPerPage)
+}
+
+document.getElementById("prev-page").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--
+    console.log(`Page changed to: ${currentPage}`)
+    updatePaginatedRecipes()
+  }
+})
+
+document.getElementById("next-page").addEventListener("click", () => {
+  if (currentPage < Math.ceil(filteredRecipes.length / recipesPerPage)) {
+    currentPage++
+    console.log(`Page changed to: ${currentPage}`)
+    updatePaginatedRecipes()
+  }
+})
+
+const updatePaginatedRecipes = () => {
+  const startIndex = (currentPage - 1) * recipesPerPage
+  const endIndex = startIndex + recipesPerPage
+  const paginatedRecipes = filteredRecipes.slice(startIndex, endIndex)
+
+  console.log(
+    `Showing recipes ${startIndex + 1} to ${endIndex} out of ${
+      filteredRecipes.length
+    }`
+  )
+
+  updateRecipeList(paginatedRecipes)
+  updatePaginationButtons()
+}
+
 // EVENT LISTENERS
 // (only add them once!)
 document.addEventListener("DOMContentLoaded", () => {
-  if (filteredRecipes.length === 0) {
+  if (recipes.length === 0) {
     console.log("Recipes not loaded yet, fetching now...")
     fetch(URL) // ✅ Make sure to fetch the recipes if they are not loaded yet
   } else {
-    updateRecipeList(filteredRecipes)
+    filteredRecipes = [...recipes]
+    //updateRecipeList(filteredRecipes)
+    updatePaginatedRecipes()
   }
 })
 
@@ -543,3 +644,7 @@ document.getElementById("random-button").addEventListener("click", () => {
 })
 
 document.getElementById("reset-filter").addEventListener("click", resetFilters)
+
+document
+  .getElementById("favorites-button")
+  .addEventListener("click", showLikedRecipes)
