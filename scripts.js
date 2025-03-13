@@ -5,7 +5,7 @@ const resetFilter = document.getElementById("reset-filter")
 
 // GLOBAL VARIABLES
 const URL =
-  "https://api.spoonacular.com/recipes/random?apiKey=690ac6592da546bc9d81f64e827555ff&number=100"
+  "https://api.spoonacular.com/recipes/random?apiKey=690ac6592da546bc9d81f64e827555ff&number=10"
 
 // Empty array to store the fetched recipes
 let recipes = []
@@ -51,10 +51,14 @@ const updateRecipeList = (filteredRecipes) => {
     const recipeCard = document.createElement("div")
     recipeCard.classList.add("recipe-card")
 
-    // Create a list of ingredients
-    const ingredientsHTML = recipe.ingredients
-      .map((ingredient) => `<li>${ingredient}</li>`)
-      .join("")
+    // Create a list of ingredients (ADDED)
+    if (!recipe.ingredients) {
+      ingredientsHTML = `<li>Ingredients not available</li>`
+    } else {
+      ingredientsHTML = recipe.ingredients
+        .map((ingredient) => `<li>${ingredient}</li>`)
+        .join("")
+    }
 
     // Add recipe details inside the div
     recipeCard.innerHTML = `
@@ -165,12 +169,14 @@ const fetchNewRecipes = () => {
       }
 
       recipes = formatRecipes([...recipes, ...data.recipes]) // Add new recipes
+      console.log(recipes)
       localStorage.setItem("recipes", JSON.stringify(recipes)) // Save them locally
       filteredRecipes = [...recipes] // Update the filtered recipes
       updateRecipeList(filteredRecipes) // Update the UI
 
       resetRecipeCountAtMidnight()
       checkRecipeLimit()
+      return recipes
     })
     .catch((error) => {
       console.error("Error fetching new recipes:", error)
