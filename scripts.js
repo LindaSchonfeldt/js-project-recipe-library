@@ -1,69 +1,134 @@
 // DOM SELECTORS
+// Function to get DOM elements by ID
+const getElement = (id) => document.getElementById(id)
 
-const recipeGrid = document.getElementById("recipe-grid")
-const resetFilter = document.getElementById("reset-filter")
+const elements = {
+  recipeGrid: getElement("recipe-grid"),
+  resetButton: getElement("reset-button"),
+  searchRecipes: getElement("search-input"),
+  randomButton: getElement("random-button")
+}
 
 // GLOBAL VARIABLES
 const URL =
-  "https://api.spoonacular.com/recipes/random?apiKey=690ac6592da546bc9d81f64e827555ff&number=100"
-
-// Empty array to store the fetched recipes
+  "https://api.spoonacular.com/recipes/random?apiKey=690ac6592da546bc9d81f64e827555ff&number=20"
 let recipes = []
-
-// Total number of recipes fetched
 let totalRecipesFetched =
   parseInt(localStorage.getItem("totalRecipesFetched")) || 0
-
-// List for chosen diets
 let dietFilters = []
-
-// Global variable to keep the filtered recipes
 let filteredRecipes = [...recipes]
-
-//Pagination variables
-const recipesPerPage = 8
 let currentPage = 1
+const recipesPerPage = 8
+
+const cuisineCategories = {
+  European: ["Italian", "French", "Spanish", "Greek", "German", "Swedish"],
+  Asian: ["Chinese", "Japanese", "Korean", "Thai", "Vietnamese", "Indian"],
+  "Middle Eastern": ["Turkish", "Lebanese", "Persian", "Israeli"],
+  American: ["Mexican", "Cajun", "Tex-Mex", "Southern"],
+  African: ["North African", "Ethiopian", "West African"],
+  Oceanian: ["Australian", "Polynesian"]
+}
 
 // FUNCTIONS
-
 // Save recipes to localStorage
 const saveRecipesToLocalStorage = () => {
   localStorage.setItem("recipes", JSON.stringify(recipes))
 }
 
+const formatRecipes = (recipes) => {
+  console.log("Formatting recipes...")
+  return recipes.map((recipe) => ({
+    ...recipe,
+    title: recipe.title ? capitalizeWords(recipe.title) : "",
+    cuisine: recipe.cuisines ? capitalizeWords(recipe.cuisines) : "Unknown",
+    dishTypes: Array.isArray(recipe.dishTypes)
+      ? recipe.dishTypes.map((dishType) => capitalizeWords(dishType))
+      : [],
+    diets: Array.isArray(recipe.diets)
+      ? recipe.diets.map((diet) => capitalizeWords(diet))
+      : [],
+    ingredients: Array.isArray(recipe.ingredients)
+      ? recipe.ingredients.map((ingredient) => capitalizeWords(ingredient))
+      : []
+  }))
+}
+
+const handleErrorMessages = () => {
+  if (error instanceof DOMException && error.name === "QuotaExceededError") {
+    console.log("LocalStorage quota exceeded!")
+    elements.recipeGrid.innerHTML = `<h3>LocalStorage is full! Please clear some space.</h3>`
+  } else if (error.toString().toLowerCase().includes("quota")) {
+    console.log("API Quota exhausted!")
+    elements.recipeGrid.innerHTML = `<h3>API Quota exhausted! Daily recipe limit reached!</h3>`
+  }
+}
+
+const fetchRecipes = () => {
+  // Fetch recipes from the Spoonacular API
+  fetch(URL)
+    .then((response) => {
+      console.log("Response from API:", response) // Debug: Log the response
+      return response.json() // Convert the response to JSON
+    })
+    .then((data) => {
+      // Keep track of the number of fetched recipes
+      totalRecipesFetched += data.recipes.length // Update the counter
+      console.log("Total recipes fetched today:", totalRecipesFetched) // Check the value
+      // Store the fetched recipes in the recipes array
+      recipes = data.recipes.map((recipe) => {
+        console.log("Cuisine data:", recipe.cuisines)
+        return {
+          id: recipe.id,
+          title: recipe.title,
+          image: recipe.image,
+          dishTypes: Array.isArray(recipe.dishTypes) ? recipe.dishTypes : [],
+          readyInMinutes: recipe.readyInMinutes,
+          servings: recipe.servings,
+          sourceUrl: recipe.sourceUrl,
+          diets: Array.isArray(recipe.diets) ? recipe.diets : [],
+          cuisine: Array.isArray(recipe.cuisines)
+            ? recipe.cuisines[0]
+            : "Unknown",
+          ingredients: Array.isArray(recipe.extendedIngredients)
+            ? recipe.extendedIngredients.map(
+                (ingredient) => ingredient.original
+              )
+            : []
+        }
+      })
+      console.log("Fetched recipes from API:", recipes) // Debug: Log the fetched recipes
+      saveRecipesToLocalStorage() // Save the recipes in localStorage
+      recipes = formatRecipes(recipes) // Format the recipes
+      filteredRecipes = [...recipes] // Update the filtered recipes
+      updatePaginatedRecipes(recipes) // Update the UI with the correct number of recipes per page
+    })
+    .catch((error) => {
+      console.error("Error fetching data:", error)
+      elements.recipeGrid.innerHTML =
+        "<p class='warning'>Failed to load recipes. Please try again later.</p>"
+    })
+}
+
 // Load recipes from localStorage
 const loadRecipesFromLocalStorage = () => {
   const storedRecipes = localStorage.getItem("recipes")
-  console.log("Loading recipes from localStorage:", recipes)
-  return storedRecipes ? JSON.parse(storedRecipes) : []
-}
-
-const updateRecipeList = (filteredRecipes) => {
-  const recipeGrid = document.getElementById("recipe-grid")
-  // Clear the grid before adding new recipes
-  recipeGrid.innerHTML = ""
-
-  // Check if there are no recipes to display
-  if (!filteredRecipes || filteredRecipes.length === 0) {
-    recipeGrid.innerHTML = `<p>No recipes found.</p>`
+  // If there are no recipes saved locally
+  if (!storedRecipes) {
+    console.log("Fetching recipes...")
+    fetchRecipes()
     return
   }
+  recipes = JSON.parse(storedRecipes)
+  console.log("Loading recipes from localStorage:", recipes)
+  filteredRecipes = [...recipes]
+  updatePaginatedRecipes()
+}
 
-  filteredRecipes.forEach((recipe) => {
-    const recipeCard = document.createElement("div")
-    recipeCard.classList.add("recipe-card")
-
-    // Create a list of ingredients
-    if (!recipe.ingredients) {
-      ingredientsHTML = `<li>Ingredients not available</li>`
-    } else {
-      ingredientsHTML = recipe.ingredients
-        .map((ingredient) => `<li>${ingredient}</li>`)
-        .join("")
-    }
-
-    // Add recipe details inside the div
-    recipeCard.innerHTML = `
+const addRecipeInfoToCard = (recipe, recipeCard) => {
+  // Get the ingredientsHTML variable from createListOfIngredients()
+  const ingredientsHTML = createListOfIngredients(recipe)
+  // Add recipe details inside the div
+  recipeCard.innerHTML = `
     <img src="${recipe.image}" alt="${recipe.title}">
     <h3>${recipe.title}</h3>
     <p><b>Dish type:</b> ${recipe.dishTypes.join(", ")}</p>
@@ -77,66 +142,54 @@ const updateRecipeList = (filteredRecipes) => {
     ${ingredientsHTML}
     </ul>
     `
-
-    // Append the recipe card to the recipe grid
-    recipeGrid.appendChild(recipeCard)
-  })
 }
 
-// Load recipes from localStorage
-recipes = loadRecipesFromLocalStorage()
-
-const fetchRecipes = () => {
-  // Fetch recipes from the Spoonacular API
-  if (recipes.length > 0) {
-    updateRecipeList(recipes) // Used saved recipes from localStorage if there are any
+const createListOfIngredients = (recipe) => {
+  let ingredientsHTML = ""
+  // Create a list of ingredients
+  if (!recipe.ingredients) {
+    ingredientsHTML = `<li>Ingredients not available</li>`
   } else {
-    fetch(URL)
-      .then((response) => {
-        console.log("Response from API:", response) // Debug: Log the response
-        return response.json() // Convert the response to JSON
-      })
-      .then((data) => {
-        // Keep track of the number of fetched recipes
-        totalRecipesFetched += data.recipes.length // Update the counter
-        console.log("Total recipes fetched today:", totalRecipesFetched) // Check the value
-        // Store the fetched recipes in the recipes array
-        recipes = data.recipes.map((recipe) => {
-          console.log("Cuisine data:", recipe.cuisines)
-          return {
-            id: recipe.id,
-            title: recipe.title,
-            image: recipe.image,
-            dishTypes: Array.isArray(recipe.dishTypes) ? recipe.dishTypes : [],
-            readyInMinutes: recipe.readyInMinutes,
-            servings: recipe.servings,
-            sourceUrl: recipe.sourceUrl,
-            diets: Array.isArray(recipe.diets) ? recipe.diets : [],
-            cuisine: Array.isArray(recipe.cuisines)
-              ? recipe.cuisines[0]
-              : "Unknown",
-            ingredients: Array.isArray(recipe.extendedIngredients)
-              ? recipe.extendedIngredients.map(
-                  (ingredient) => ingredient.original
-                )
-              : []
-          }
-        })
-        console.log("Fetched recipes from API:", recipes) // Debug: Log the fetched recipes
-        saveRecipesToLocalStorage() // Save the recipes in localStorage
-        recipes = formatRecipes(recipes) // Format the recipes
-        filteredRecipes = [...recipes] // Update the filtered recipes
-        updateRecipeList(recipes) // Update the UI with the fetched recipes
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error)
-        recipeGrid.innerHTML =
-          "<p class='warning'>Failed to load recipes. Please try again later.</p>"
-      })
+    ingredientsHTML = recipe.ingredients
+      .map((ingredient) => `<li>${ingredient}</li>`)
+      .join("")
+  }
+  return ingredientsHTML
+}
+
+const noRecipesToDisplay = () => {
+  if (!filteredRecipes || filteredRecipes.length === 0) {
+    elements.recipeGrid.innerHTML = `<p>No recipes found.</p>`
+    return
   }
 }
 
-fetchRecipes()
+const createRecipeCard = (updatePaginatedRecipes) => {
+  // Create a card for each recipe
+  updatePaginatedRecipes.forEach((recipe) => {
+    const recipeCard = document.createElement("div")
+    recipeCard.classList.add("recipe-card")
+
+    // Create list of ingredients and then add the recipe info to the card
+    createListOfIngredients(recipe)
+    addRecipeInfoToCard(recipe, recipeCard)
+
+    // Append the recipe card to the recipe grid
+    elements.recipeGrid.appendChild(recipeCard)
+  })
+}
+
+// Update the UI with recipes
+const updateRecipeList = (recipes) => {
+  // Clear the grid before adding new recipes
+  elements.recipeGrid.innerHTML = ""
+
+  // Check if there are no recipes to display
+  noRecipesToDisplay()
+
+  // Create a card for each recipe
+  createRecipeCard(recipes)
+}
 
 const fetchNewRecipes = () => {
   fetch(URL)
@@ -158,17 +211,7 @@ const fetchNewRecipes = () => {
     })
     .catch((error) => {
       console.error("Error fetching new recipes:", error)
-
-      if (
-        error instanceof DOMException &&
-        error.name === "QuotaExceededError"
-      ) {
-        console.log("LocalStorage quota exceeded!")
-        recipeGrid.innerHTML = `<h3>LocalStorage is full! Please clear some space.</h3>`
-      } else if (error.toString().toLowerCase().includes("quota")) {
-        console.log("API Quota exhausted!")
-        recipeGrid.innerHTML = `<h3>API Quota exhausted! Daily recipe limit reached!</h3>`
-      }
+      handleErrorMessages(error)
     })
 }
 
@@ -177,24 +220,6 @@ const capitalizeWords = (str) => {
     .split(" ") // Divide the string into words
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
     .join(" ") // Put the words back together again
-}
-
-const formatRecipes = (recipes) => {
-  console.log("Formatting recipes...")
-  return recipes.map((recipe) => ({
-    ...recipe,
-    title: recipe.title ? capitalizeWords(recipe.title) : "",
-    cuisine: recipe.cuisines ? capitalizeWords(recipe.cuisines) : "Unknown",
-    dishTypes: Array.isArray(recipe.dishTypes)
-      ? recipe.dishTypes.map((dishType) => capitalizeWords(dishType))
-      : [],
-    diets: Array.isArray(recipe.diets)
-      ? recipe.diets.map((diet) => capitalizeWords(diet))
-      : [],
-    ingredients: Array.isArray(recipe.ingredients)
-      ? recipe.ingredients.map((ingredient) => capitalizeWords(ingredient))
-      : []
-  }))
 }
 
 const searchRecipes = () => {
@@ -206,12 +231,8 @@ const searchRecipes = () => {
   // Start with all recipes when searching from scratch
   let baseRecipes = recipes
 
-  // In your search function, protect against undefined values
-
+  // If search is empty, use the filtered recipes or all recipes
   if (!searchInput) {
-    // Apply other filters first (optional)
-
-    // If search is empty, use the filtered recipes or all recipes
     filterRecipes()
     return
   }
@@ -229,7 +250,7 @@ const searchRecipes = () => {
   )
   // Update filteredRecipes to maintain state
   filteredRecipes = searchResults
-  updateRecipeList(searchResults)
+  updatePaginatedRecipes()
 }
 
 const toggleDropdown = (event) => {
@@ -272,103 +293,122 @@ const selectedOption = (event) => {
   console.log("Filter type: ", dropdown.dataset.filterType)
 }
 
-const filterRecipes = () => {
-  // Reset to page 1 for each filter
-  currentPage = 1
-
-  // Get selected filters
+const timeFilter = (recipe) => {
+  //Assume it is true at first
+  let timeMatch = true
   const timeFilter = document
     .querySelector('[data-filter-type="time"] .selected-option')
     .textContent.trim()
+
+  // Check if a specific time is selected, otherwise, all times are included
+  if (timeFilter !== "All times") {
+    if (timeFilter === "Under 30 min") {
+      timeMatch = recipe.readyInMinutes < 30
+    } else if (timeFilter === "30-60 min") {
+      timeMatch = recipe.readyInMinutes >= 30 && recipe.readyInMinutes <= 60
+    } else if (timeFilter === "61-90 min") {
+      timeMatch = recipe.readyInMinutes >= 61 && recipe.readyInMinutes <= 90
+    } else if (timeFilter === "Over 90 min") {
+      timeMatch = recipe.readyInMinutes > 90
+    }
+  }
+  return timeMatch
+}
+
+const ingredientFilter = (recipe) => {
+  let ingredientMatch = true
 
   const ingredientFilter = document
     .querySelector('[data-filter-type="ingredients"] .selected-option')
     .textContent.trim()
 
+  // Check if a specific number of ingredient is selected, otherwise, all number of ingredient are included
+  if (ingredientFilter !== "All ingredients") {
+    if (ingredientFilter === "Under 5 ingredients") {
+      ingredientMatch = recipe.ingredients.length < 5
+    } else if (ingredientFilter === "5-10 ingredients") {
+      ingredientMatch =
+        recipe.ingredients.length > 4 && recipe.ingredients.length < 11
+    } else if (ingredientFilter === "11-15 ingredients") {
+      ingredientMatch =
+        recipe.ingredients.length > 10 && recipe.ingredients.length < 16
+    } else if (ingredientFilter === "Over 15 ingredients") {
+      ingredientMatch = recipe.ingredients.length > 15
+    }
+  }
+  return ingredientMatch
+}
+
+const dishTypeFilter = (recipe) => {
+  let dishTypeMatch = true
+
   const dishTypeFilter = document
     .querySelector('[data-filter-type="dish-type"] .selected-option')
     .textContent.trim()
+
+  if (dishTypeFilter !== "All dish types") {
+    dishTypeMatch = recipe.dishTypes
+      .map((dt) => dt.toLowerCase())
+      .includes(dishTypeFilter.toLowerCase())
+  }
+  return dishTypeMatch
+}
+
+const cuisineFilter = (recipe) => {
+  let cuisineMatch = true
 
   const cuisineFilter = document
     .querySelector('[data-filter-type="cuisine"] .selected-option')
     .textContent.trim()
 
+  if (cuisineFilter !== "All cuisines") {
+    cuisineMatch = Array.isArray(recipe.cuisine)
+      ? recipe.cuisine.includes(cuisineFilter)
+      : recipe.cuisine === cuisineFilter
+  }
+  return cuisineMatch
+}
+
+const dietFilter = (recipe) => {
+  let dietMatch = true
+
   const dietFilter = document
     .querySelector('[data-filter-type="diet"] .selected-option')
     .textContent.trim()
 
+  // Diet filter: Recipes must match all selected diets
+  if (dietFilters.length > 0) {
+    dietMatch = dietFilters.every((diet) =>
+      recipe.diets.map((d) => d.toLowerCase()).includes(diet.toLowerCase())
+    )
+  }
+  return dietMatch
+}
+
+const filterRecipes = () => {
+  // Reset to page 1 for each filter
+  currentPage = 1
+
   // Check if recipes exists
   if (!recipes || recipes.length === 0) {
-    recipeGrid.innerHTML = "<p>No recipes found.</p>"
+    elements.recipeGrid.innerHTML = "<p>No recipes found.</p>"
     console.warn("No recipes available to filter.")
     return
   }
 
   // Filter the recipes
   filteredRecipes = recipes.filter((recipe) => {
-    // Assume match unless proven otherwise
-    let timeMatch = true
-    let ingredientMatch = true
-    let dishTypeMatch = true
-    let cuisineMatch = true
-    let dietMatch = true
+    const timeMatch = timeFilter(recipe)
+    const ingredientMatch = ingredientFilter(recipe)
+    const dishTypeMatch = dishTypeFilter(recipe)
+    const cuisineMatch = cuisineFilter(recipe)
+    const dietMatch = dietFilter(recipe)
 
-    // Ingredient filter
-    // Check if a specific number of ingredient is selected, otherwise, all number of ingredient are included
-    if (ingredientFilter !== "All ingredients") {
-      if (ingredientFilter === "Under 5 ingredients") {
-        ingredientMatch = recipe.ingredients.length < 5
-      } else if (ingredientFilter === "5-10 ingredients") {
-        ingredientMatch =
-          recipe.ingredients.length > 4 && recipe.ingredients.length < 11
-      } else if (ingredientFilter === "11-15 ingredients") {
-        ingredientMatch =
-          recipe.ingredients.length > 10 && recipe.ingredients.length < 16
-      } else if (ingredientFilter === "Over 15 ingredients") {
-        ingredientMatch = recipe.ingredients.length > 15
-      }
-    }
-
-    // Time filter
-    // Check if a specific time is selected, otherwise, all times are included
-    if (timeFilter !== "All times") {
-      if (timeFilter === "Under 30 min") {
-        timeMatch = recipe.readyInMinutes < 30
-      } else if (timeFilter === "30-60 min") {
-        timeMatch = recipe.readyInMinutes >= 30 && recipe.readyInMinutes <= 60
-      } else if (timeFilter === "61-90 min") {
-        timeMatch = recipe.readyInMinutes >= 61 && recipe.readyInMinutes <= 90
-      } else if (timeFilter === "Over 90 min") {
-        timeMatch = recipe.readyInMinutes > 90
-      }
-    }
-
-    // Dish types filter
-    if (dishTypeFilter !== "All dish types") {
-      dishTypeMatch = recipe.dishTypes
-        .map((dt) => dt.toLowerCase())
-        .includes(dishTypeFilter.toLowerCase())
-    }
-
-    // Cuisine filter
-    if (cuisineFilter !== "All cuisines") {
-      cuisineMatch = Array.isArray(recipe.cuisine)
-        ? recipe.cuisine.includes(cuisineFilter)
-        : recipe.cuisine === cuisineFilter
-    }
-
-    // Diet filter: Recipes must match all selected diets
-    if (dietFilters.length > 0) {
-      dietMatch = dietFilters.every((diet) =>
-        recipe.diets.map((d) => d.toLowerCase()).includes(diet.toLowerCase())
-      )
-    } else {
-      dietMatch = true
-    }
     return (
       timeMatch && ingredientMatch && dishTypeMatch && cuisineMatch && dietMatch
     )
   })
+
   // Update the UI with the filtered recipes
   sortRecipes(
     document
@@ -456,11 +496,11 @@ const resetFilters = () => {
 
   // Reset the filtered recipes to all recipes
   filteredRecipes = [...recipes]
-  updatePaginatedRecipes()
+  filterRecipes()
 
   // Update the UI after a short delay
   setTimeout(() => {
-    updatePaginatedRecipes()
+    filterRecipes()
   }, 10)
 
   // Close open dropdowns
@@ -539,22 +579,22 @@ const updatePaginatedRecipes = () => {
   updatePaginationButtons()
 }
 
-// EVENT LISTENERS
-// (only add them once!)
+const initializeEventListeners = () => {
+  elements.resetButton.addEventListener("click", resetFilters)
+  elements.randomButton.addEventListener("click", generateRandomRecipe)
+  elements.searchRecipes.addEventListener("input", searchRecipes)
+  document
+    .getElementById("random-button")
+    .addEventListener("click", generateRandomRecipe)
+}
+
+// INITIALIZE PAGE
 document.addEventListener("DOMContentLoaded", () => {
-  if (recipes.length === 0) {
+  if (!recipes || recipes.length === 0) {
     console.log("Recipes not loaded yet, fetching now...")
-    fetch(URL) // ✅ Make sure to fetch the recipes if they are not loaded yet
-  } else {
-    filteredRecipes = [...recipes]
-    updatePaginatedRecipes()
+    fetchRecipes()
   }
+  filteredRecipes = [...recipes]
+  updatePaginatedRecipes()
+  initializeEventListeners()
 })
-
-document.getElementById("search-input").addEventListener("input", searchRecipes)
-
-document.getElementById("random-button").addEventListener("click", () => {
-  generateRandomRecipe()
-})
-
-document.getElementById("reset-filter").addEventListener("click", resetFilters)
