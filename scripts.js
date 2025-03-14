@@ -80,19 +80,6 @@ const updateRecipeList = (filteredRecipes) => {
 
     // Append the recipe card to the recipe grid
     recipeGrid.appendChild(recipeCard)
-
-    // Create hover effect in here to make it work since the card is created using JS
-    document.querySelectorAll(".recipe-card").forEach((card) => {
-      card.addEventListener("mouseenter", () => {
-        card.style.border = "2px solid #0018a4"
-        card.style.boxShadow = "0px 0px 30px 0px rgba(0, 24, 164, 0.2)"
-      })
-
-      card.addEventListener("mouseleave", () => {
-        card.style.border = "1px solid #e9e9e9"
-        card.style.boxShadow = "none"
-      })
-    })
   })
 }
 
@@ -184,29 +171,6 @@ const fetchNewRecipes = () => {
       }
     })
 }
-
-/* const resetRecipeCountAtMidnight = () => {
-  const today = new Date().toISOString().split("T")[0] // Get today's date in YYYY-MM-DD format
-  const lastFetchDate = localStorage.getItem("lastFetchDate")
-
-  if (lastFetchDate !== today) {
-    localStorage.setItem("totalRecipesFetched", 0) // Reset the counter to 0
-    localStorage.setItem("lastFetchDate", today) // Update the date
-    console.log("New day detected, resetting recipe count!")
-  }
-}
-
-// Check if the recipe limit is reached
-const checkRecipeLimit = () => {
-  if (totalRecipesFetched >= 400) {
-    recipeGrid.insertAdjacentHTML(
-      "beforeend",
-      "<p class='warning'>Daily recipe limit reached!</p>"
-    )
-    console.log("Daily recipe limit reached!")
-    recipeGrid.innerHTML(` API Quota exhausted! Daily recipe limit reached! `)
-  }
-} */
 
 const capitalizeWords = (str) => {
   return str
@@ -442,6 +406,8 @@ const toggleDiet = (event) => {
 
 // Random Recipe Generator
 const generateRandomRecipe = () => {
+  // Turn off pagination
+  document.getElementById("pagination-controls").style.display = "none"
   // Get a random recipe from the array
   const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)]
   // Update the UI with the random recipe
@@ -484,6 +450,10 @@ const resetFilters = () => {
     console.warn("Recipes not loaded yet. Reset delayed.")
     return
   }
+
+  // Turn on the pagination again if the last page was "random recipe"
+  document.getElementById("pagination-controls").style.display = "flex"
+
   // Reset the filtered recipes to all recipes
   filteredRecipes = [...recipes]
   updatePaginatedRecipes()
