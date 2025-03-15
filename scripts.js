@@ -56,13 +56,13 @@ const cuisineCategories = {
 
 // FUNCTIONS
 
+const loadingMessage = () => {
+  elements.recipeGrid.innerHTML = `<h3 class="loading-message">Loading recipes...</h3>`
+}
+
 // Save recipes to localStorage
 const saveRecipesToLocalStorage = () => {
   localStorage.setItem("recipes", JSON.stringify(recipes))
-}
-
-const loadingMessage = () => {
-  elements.recipeGrid.innerHTML = `Recipes loading... I hope you can take the hunger!`
 }
 
 const matchCuisineCategory = (cuisines) => {
@@ -699,14 +699,16 @@ const initializeEventListeners = () => {
 
 // INITIALIZE PAGE
 document.addEventListener("DOMContentLoaded", () => {
-  if (!recipes || recipes.length === 0) {
-    console.log("Recipes not loaded yet, fetching now...")
-    loadingMessage()
-    loadRecipesFromLocalStorage()
-  } else {
-    fetchRecipes()
-  }
-  filteredRecipes = [...recipes]
-  updatePaginatedRecipes()
-  initializeEventListeners()
+  loadingMessage()
+
+  setTimeout(() => {
+    if (!recipes || recipes.length === 0) {
+      loadRecipesFromLocalStorage()
+    } else {
+      fetchRecipes()
+    }
+    filteredRecipes = [...recipes]
+    updatePaginatedRecipes()
+    initializeEventListeners()
+  }, 2000) //Timeout is set to 2s
 })

@@ -1,157 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="stylesheet" href="./styles.css" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./styles.css" />
-    <title>Recipe Library</title></head
-  ><!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="stylesheet" href="./styles.css" />
-      <title>Recipe Library</title>
-    </head>
+    <title>Recipe Library</title>
+  </head>
 
-    <body>
-      <header>
-        <h1>Recipe Library</h1>
-      </header>
+  <body>
+    <header>
+      <h1>Recipe Library</h1>
+    </header>
 
-      <main>
-        <section id="search-section">
-          <input
-            type="text"
-            id="search-input"
-            placeholder="Search for recipes..."
-          />
-        </section>
+    <main>
+      <section id="search-section">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search for recipes..."
+        />
+      </section>
 
-        <section id="filter-section">
-          <div class="filters">
-            <h2>Filter on ingredients</h2>
-            <div class="custom-select" data-filter-type="ingredients">
-              <div class="select-box blue">
-                <span class="selected-option">All ingredients</span>
-                <span class="icon">▼</span>
-              </div>
-              <div class="options-container blue">
-                <div class="option">All ingredients</div>
-                <div class="option">Under 5 ingredients</div>
-                <div class="option">5-10 ingredients</div>
-                <div class="option">11-15 ingredients</div>
-                <div class="option">Over 15 ingredients</div>
-              </div>
+      <section id="filter-section">
+        <div class="filters">
+          <h2>Filter on ingredients</h2>
+          <div class="custom-select" data-filter-type="ingredients">
+            <div class="select-box blue">
+              <span class="selected-option">All ingredients</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container blue">
+              <div class="option">All ingredients</div>
+              <div class="option">Under 5 ingredients</div>
+              <div class="option">5-10 ingredients</div>
+              <div class="option">11-15 ingredients</div>
+              <div class="option">Over 15 ingredients</div>
             </div>
           </div>
-
-          <div class="filters">
-            <h2>Filter on time</h2>
-            <div class="custom-select" data-filter-type="time">
-              <div class="select-box blue">
-                <span class="selected-option">All times</span>
-                <span class="icon">▼</span>
-              </div>
-              <div class="options-container blue">
-                <div class="option">All times</div>
-                <div class="option">Under 30 min</div>
-                <div class="option">30-60 min</div>
-                <div class="option">61-90 min</div>
-                <div class="option">Over 90 min</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="filters">
-            <h2>Filter on dish types</h2>
-            <div class="custom-select" data-filter-type="dish-type">
-              <div class="select-box blue">
-                <span class="selected-option">All dish types</span>
-                <span class="icon">▼</span>
-              </div>
-              <div class="options-container blue">
-                <div class="option">All dish types</div>
-                <div class="option">Breakfast</div>
-                <div class="option">Lunch</div>
-                <div class="option">Dinner</div>
-                <div class="option">Dessert</div>
-                <div class="option">Drink</div>
-                <div class="option">Snack</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="filters">
-            <h2>Filter on cuisine</h2>
-            <div class="custom-select" data-filter-type="cuisine">
-              <div class="select-box blue">
-                <span class="selected-option">All cuisines</span>
-                <span class="icon">▼</span>
-              </div>
-              <div class="options-container blue">
-                <div class="option">All cuisines</div>
-                <div class="option">European</div>
-                <div class="option">Asian</div>
-                <div class="option">American</div>
-                <div class="option">Middle Eastern</div>
-                <div class="option">African</div>
-                <div class="option">Oceanian</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="filters">
-            <h2>Filter on diet</h2>
-            <div class="custom-select" data-filter-type="diet">
-              <div class="select-box blue">
-                <span class="selected-option">All diets</span>
-                <span class="icon">▼</span>
-              </div>
-              <div class="options-container blue">
-                <div class="option" data-selected="false">Vegan</div>
-                <div class="option" data-selected="false">
-                  Lacto Ovo Vegetarian
-                </div>
-                <div class="option" data-selected="false">Gluten Free</div>
-                <div class="option" data-selected="false">Dairy Free</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="filters">
-            <h2>Sort recipes</h2>
-            <div class="custom-select" data-filter-type="sort">
-              <div class="select-box pink">
-                <span class="selected-option">Choose an alternative</span>
-                <span class="icon">▼</span>
-              </div>
-              <div class="options-container pink">
-                <div class="option">Sort by time</div>
-                <div class="option">Sort by popularity</div>
-              </div>
-            </div>
-          </div>
-
-          <section id="button-section">
-            <button id="random-button">Random recipe</button>
-            <button id="reset-button">Reset Filters</button>
-          </section>
-        </section>
-
-        <section id="recipe-section">
-          <div id="error-container"></div>
-          <div id="recipe-grid"></div>
-        </section>
-
-        <!-- Pagination -->
-        <div id="pagination-controls">
-          <button id="prev-page">Previous</button>
-          <span id="page-info"></span>
-          <button id="next-page">Next</button>
         </div>
-      </main>
-      <script src="./scripts.js" defer></script>
-    </body>
-  </html>
+
+        <div class="filters">
+          <h2>Filter on time</h2>
+          <div class="custom-select" data-filter-type="time">
+            <div class="select-box blue">
+              <span class="selected-option">All times</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container blue">
+              <div class="option">All times</div>
+              <div class="option">Under 30 min</div>
+              <div class="option">30-60 min</div>
+              <div class="option">61-90 min</div>
+              <div class="option">Over 90 min</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters">
+          <h2>Filter on dish types</h2>
+          <div class="custom-select" data-filter-type="dish-type">
+            <div class="select-box blue">
+              <span class="selected-option">All dish types</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container blue">
+              <div class="option">All dish types</div>
+              <div class="option">Breakfast</div>
+              <div class="option">Lunch</div>
+              <div class="option">Dinner</div>
+              <div class="option">Dessert</div>
+              <div class="option">Drink</div>
+              <div class="option">Snack</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters">
+          <h2>Filter on cuisine</h2>
+          <div class="custom-select" data-filter-type="cuisine">
+            <div class="select-box blue">
+              <span class="selected-option">All cuisines</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container blue">
+              <div class="option">All cuisines</div>
+              <div class="option">European</div>
+              <div class="option">Asian</div>
+              <div class="option">American</div>
+              <div class="option">Middle Eastern</div>
+              <div class="option">African</div>
+              <div class="option">Oceanian</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters">
+          <h2>Filter on diet</h2>
+          <div class="custom-select" data-filter-type="diet">
+            <div class="select-box blue">
+              <span class="selected-option">All diets</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container blue">
+              <div class="option" data-selected="false">Vegan</div>
+              <div class="option" data-selected="false">
+                Lacto Ovo Vegetarian
+              </div>
+              <div class="option" data-selected="false">Gluten Free</div>
+              <div class="option" data-selected="false">Dairy Free</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters">
+          <h2>Sort recipes</h2>
+          <div class="custom-select" data-filter-type="sort">
+            <div class="select-box pink">
+              <span class="selected-option">Choose an alternative</span>
+              <span class="icon">▼</span>
+            </div>
+            <div class="options-container pink">
+              <div class="option">Sort by time</div>
+              <div class="option">Sort by popularity</div>
+            </div>
+          </div>
+        </div>
+
+        <section id="button-section">
+          <button id="random-button">Random recipe</button>
+          <button id="reset-button">Reset Filters</button>
+        </section>
+      </section>
+
+      <section id="recipe-section">
+        <div id="error-container"></div>
+        <div id="recipe-grid"></div>
+      </section>
+
+      <!-- Pagination -->
+      <div id="pagination-controls">
+        <button id="prev-page">Previous</button>
+        <span id="page-info"></span>
+        <button id="next-page">Next</button>
+      </div>
+    </main>
+    <script src="./scripts.js" defer></script>
+  </body>
 </html>

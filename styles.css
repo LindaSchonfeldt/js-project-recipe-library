@@ -57,6 +57,24 @@ h2 {
   margin: 0 0 0.5rem 0;
 }
 
+.loading-message {
+  font-size: 2rem;
+  color: #0018a4;
+  text-align: center;
+  margin: 2rem 0;
+  animation: fadeIn 1s;
+}
+
+/* FadeIn animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 #search-section {
   display: flex;
   flex-direction: column;
