@@ -3,15 +3,17 @@
 const getElement = (id) => document.getElementById(id)
 
 const elements = {
-  recipeGrid: getElement("recipe-grid"),
-  resetButton: getElement("reset-button"),
-  searchRecipes: getElement("search-input"),
-  randomButton: getElement("random-button")
+  recipeGrid: document.getElementById("recipe-grid"),
+  resetButton: document.getElementById("reset-button"),
+  searchRecipes: document.getElementById("search-input"),
+  randomButton: document.getElementById("random-button"),
+  selectBoxes: document.querySelectorAll(".select-box"), // All select-boxes
+  options: document.querySelectorAll(".custom-select .option")
 }
 
 // GLOBAL VARIABLES
 const URL =
-  "https://api.spoonacular.com/recipes/random?apiKey=690ac6592da546bc9d81f64e827555ff&number=20"
+  "https://api.spoonacular.com/recipes/random?apiKey=690ac6592da546bc9d81f64e827555ff&number=100"
 let recipes = []
 let totalRecipesFetched =
   parseInt(localStorage.getItem("totalRecipesFetched")) || 0
@@ -21,7 +23,19 @@ let currentPage = 1
 const recipesPerPage = 8
 
 const cuisineCategories = {
-  European: ["Italian", "French", "Spanish", "Greek", "German", "Swedish"],
+  European: [
+    "Italian",
+    "French",
+    "Spanish",
+    "Greek",
+    "German",
+    "Swedish",
+    "English",
+    "British",
+    "Irish",
+    "Scottish",
+    "Mediterranean"
+  ],
   Asian: ["Chinese", "Japanese", "Korean", "Thai", "Vietnamese", "Indian"],
   "Middle Eastern": ["Turkish", "Lebanese", "Persian", "Israeli"],
   American: ["Mexican", "Cajun", "Tex-Mex", "Southern"],
@@ -30,47 +44,86 @@ const cuisineCategories = {
 }
 
 // FUNCTIONS
+
 // Save recipes to localStorage
 const saveRecipesToLocalStorage = () => {
   localStorage.setItem("recipes", JSON.stringify(recipes))
 }
 
-const formatRecipes = (recipes) => {
-  console.log("Formatting recipes...")
-  return recipes.map((recipe) => ({
-    ...recipe,
-    title: recipe.title ? capitalizeWords(recipe.title) : "",
-    cuisine: recipe.cuisines ? capitalizeWords(recipe.cuisines) : "Unknown",
-    dishTypes: Array.isArray(recipe.dishTypes)
-      ? recipe.dishTypes.map((dishType) => capitalizeWords(dishType))
-      : [],
-    diets: Array.isArray(recipe.diets)
-      ? recipe.diets.map((diet) => capitalizeWords(diet))
-      : [],
-    ingredients: Array.isArray(recipe.ingredients)
-      ? recipe.ingredients.map((ingredient) => capitalizeWords(ingredient))
-      : []
-  }))
+const loadingMessage = () => {
+  elements.recipeGrid.innerHTML = `Recipes loading... I hope you can take the hunger!`
 }
 
-const handleErrorMessages = () => {
+const matchCuisineCategory = (cuisines) => {
+  if (!Array.isArray(cuisines) || cuisines.length === 0) {
+    return "Unknown"
+  }
+
+  for (let category in cuisineCategories) {
+    if (
+      cuisines.some((cuisine) => cuisineCategories[category].includes(cuisine))
+    )
+      return category // Returns the category that first matches
+  }
+  return "Unknown"
+}
+
+const formatRecipes = (recipes) => {
+  console.log("Formatting recipes...")
+  return recipes.map((recipe) => {
+    console.log("Recipe cuisines:", recipe.cuisines)
+    let cuisineCategory = matchCuisineCategory(recipe.cuisines)
+
+    return {
+      ...recipe,
+      title: recipe.title ? capitalizeWords(recipe.title) : "Unknown title",
+      cuisine: cuisineCategory,
+      dishTypes: Array.isArray(recipe.dishTypes)
+        ? recipe.dishTypes.map((dishType) => capitalizeWords(dishType))
+        : [],
+      diets: Array.isArray(recipe.diets)
+        ? recipe.diets.map((diet) => capitalizeWords(diet))
+        : [],
+      ingredients: Array.isArray(recipe.ingredients)
+        ? recipe.ingredients.map((ingredient) => capitalizeWords(ingredient))
+        : []
+    }
+  })
+}
+
+const handleErrorMessages = (error) => {
   if (error instanceof DOMException && error.name === "QuotaExceededError") {
     console.log("LocalStorage quota exceeded!")
-    elements.recipeGrid.innerHTML = `<h3>LocalStorage is full! Please clear some space.</h3>`
+    message = `<h3>LocalStorage is full! Please clear some space.</h3>`
   } else if (error.toString().toLowerCase().includes("quota")) {
     console.log("API Quota exhausted!")
-    elements.recipeGrid.innerHTML = `<h3>API Quota exhausted! Daily recipe limit reached!</h3>`
+    message = `<h3>API Quota exhausted! Daily recipe limit reached!</h3>`
+  } else if (error.message.includes("HTTP error! status: 402")) {
+    message = "API Quota exceeded - HTTP 402!"
+    message =
+      "Oops! You've reached the daily limit for fetching recipes. Try again tomorrow."
   }
+  elements.recipeGrid.innerHTML = `
+    <div class="error-message">
+      <h3>${message}</h3>
+      <p>If you want more recipes, consider upgrading your API plan.</p>
+    </div>
+  `
 }
 
 const fetchRecipes = () => {
   // Fetch recipes from the Spoonacular API
-  fetch(URL)
+  fetch(URL, { mode: "cors" })
     .then((response) => {
       console.log("Response from API:", response) // Debug: Log the response
+      // Throw extra error to find what's wrong in the case that something is
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
       return response.json() // Convert the response to JSON
     })
     .then((data) => {
+      console.log("Raw API response:", data) // Console log exactly what the API returns
       // Keep track of the number of fetched recipes
       totalRecipesFetched += data.recipes.length // Update the counter
       console.log("Total recipes fetched today:", totalRecipesFetched) // Check the value
@@ -106,6 +159,7 @@ const fetchRecipes = () => {
       console.error("Error fetching data:", error)
       elements.recipeGrid.innerHTML =
         "<p class='warning'>Failed to load recipes. Please try again later.</p>"
+      handleErrorMessages(error)
     })
 }
 
@@ -216,10 +270,12 @@ const fetchNewRecipes = () => {
 }
 
 const capitalizeWords = (str) => {
+  if (!str) return "" // If str is null/undefined - return an empty string
+  if (Array.isArray(str)) str = str.join(" ") // If it's an array - make it a string
   return str
-    .split(" ") // Divide the string into words
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
-    .join(" ") // Put the words back together again
+    .split(" ") // Seperate into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Captalize every word
+    .join(" ") // Join them together again
 }
 
 const searchRecipes = () => {
@@ -253,7 +309,7 @@ const searchRecipes = () => {
   updatePaginatedRecipes()
 }
 
-const toggleDropdown = (event) => {
+function toggleDropdown(event) {
   event.stopPropagation() // Prevent the dropdown from closing when clicking on the dropdown itself
 
   // Find the closest .custom-select for the clicked element
@@ -276,6 +332,11 @@ const selectedOption = (event) => {
 
   // Dropdown is now a local variable!
   const dropdown = option.closest(".custom-select")
+
+  if (!dropdown) {
+    console.warn("Dropdown container not found for option:", option)
+    return
+  }
 
   // Update the dropdown's heading with the chosen option
   dropdown.querySelector(".selected-option").textContent =
@@ -505,26 +566,22 @@ const resetFilters = () => {
 
   // Close open dropdowns
   document.querySelectorAll(".custom-select").forEach((select) => {
-    select.classList.remove("active")
+    const filterType = select.dataset.filterType
+    const selectedOption = select.querySelector(".selected-option")
+    selectedOption.textContent =
+      filterType === "diet"
+        ? "All diets"
+        : filterType === "cuisine"
+        ? "All cuisines"
+        : filterType === "dish-type"
+        ? "All dish types"
+        : filterType === "time"
+        ? "All times"
+        : filterType === "ingredients"
+        ? "All ingredients"
+        : "Choose an alternative"
   })
 
-  document
-    .querySelectorAll(".custom-select .selected-option")
-    .forEach((option) => {
-      const filterType = option.closest(".custom-select").dataset.filterType
-      option.textContent =
-        filterType === "diet"
-          ? "All diets"
-          : filterType === "cuisine"
-          ? "All cuisines"
-          : filterType === "dish-type"
-          ? "All dish types"
-          : filterType === "time"
-          ? "All times"
-          : filterType === "ingredients"
-          ? "All ingredients"
-          : "Choose an alternative"
-    })
   // Reset the diet filters
   dietFilters = []
   // Reset the selected state of the diet options
@@ -583,15 +640,29 @@ const initializeEventListeners = () => {
   elements.resetButton.addEventListener("click", resetFilters)
   elements.randomButton.addEventListener("click", generateRandomRecipe)
   elements.searchRecipes.addEventListener("input", searchRecipes)
-  document
-    .getElementById("random-button")
-    .addEventListener("click", generateRandomRecipe)
+  elements.selectBoxes.forEach((box) => {
+    box.addEventListener("click", toggleDropdown)
+  })
+  elements.options.forEach((option) => {
+    // Check what dropdown the alternative belongs to
+    const parentType = option.closest(".custom-select").dataset.filterType
+    if (parentType === "diet") {
+      option.addEventListener("click", toggleDiet)
+    } else if (parentType === "sort") {
+      option.addEventListener("click", selectedOption)
+    } else {
+      option.addEventListener("click", selectedOption)
+    }
+  })
 }
 
 // INITIALIZE PAGE
 document.addEventListener("DOMContentLoaded", () => {
   if (!recipes || recipes.length === 0) {
     console.log("Recipes not loaded yet, fetching now...")
+    loadingMessage()
+    loadRecipesFromLocalStorage()
+  } else {
     fetchRecipes()
   }
   filteredRecipes = [...recipes]
