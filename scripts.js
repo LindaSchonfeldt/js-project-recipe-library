@@ -72,6 +72,7 @@ const matchCuisineCategory = (cuisines) => {
 
   for (let category in cuisineCategories) {
     if (
+      cuisines &&
       cuisines.some((cuisine) => cuisineCategories[category].includes(cuisine))
     )
       return category // Returns the category that first matches
@@ -106,18 +107,16 @@ const handleErrorMessages = (error) => {
   console.error("Error detected:", error)
 
   let message = "An unexpected error occurred. Please try again."
-  let messageType = "warning" // Standard är varning (orange bakgrund)
+  let messageType = "warning"
 
-  // If the API answer includes status: "failure" or "code: 402"
-  if (
-    typeof error === "object" &&
-    error.status === "failure" &&
-    error.code === 402
-  ) {
-    console.log("API Quota exceeded - 402 detected in API response.")
-    message =
-      error.message || "API Quota exhausted! You have reached the daily limit."
-    messageType = "error"
+  if (typeof error === "object" && error !== null) {
+    if (error.status === "failure" && error.code === 402) {
+      console.log("API Quota exceeded - 402 detected in API response.")
+      message =
+        error.message ||
+        "API Quota exhausted! You have reached the daily limit."
+      messageType = "error"
+    }
   } else if (
     error instanceof DOMException &&
     error.name === "QuotaExceededError"
@@ -125,29 +124,24 @@ const handleErrorMessages = (error) => {
     console.log("LocalStorage quota exceeded!")
     message = "LocalStorage is full! Please clear some space."
     messageType = "error"
-  } else if (error.toString().toLowerCase().includes("quota")) {
+  } else if (
+    typeof error === "string" &&
+    error.toLowerCase().includes("quota")
+  ) {
     console.log("API Quota exhausted!")
     message = "API Quota exhausted! You have reached the daily limit."
-    messageType = "error"
-  } else if (
-    error.message &&
-    error.message.includes("HTTP error! status: 402")
-  ) {
-    console.log("API Quota exceeded - HTTP 402!")
-    message =
-      "Oops! You've reached the daily limit for fetching recipes. Try again tomorrow."
     messageType = "error"
   } else {
     console.error("Error fetching data:", error)
     message = "Failed to load recipes. Please try again later."
   }
 
-  // Update the error message in the HTML
+  // Update the message in the HTML
   const errorContainer = document.getElementById("error-container")
   if (errorContainer) {
     errorContainer.innerHTML = `<h3>${message}</h3>`
-    errorContainer.className = messageType // Adds the correct CSS class
-    errorContainer.style.display = "block" // Show the message
+    errorContainer.className = messageType
+    errorContainer.style.display = "block"
   }
 }
 
@@ -295,22 +289,23 @@ const fetchNewRecipes = () => {
     .then((data) => {
       console.log("Fetched data:", data) // Debug: Log the API's answer
 
-      if (!data.recipes || data.recipes.length === 0) {
-        console.warn("No new recipes fetched!")
-        return // Stop this function if no new recipes are being collected
-      }
-
       // If the API answers with "failure" and the code 402
       if (data.status === "failure" && data.code === 402) {
         throw data
       }
 
-      recipes = formatRecipes([...recipes, ...data.recipes]) // Add new recipes
-      console.log(recipes)
-      localStorage.setItem("recipes", JSON.stringify(recipes)) // Save them locally
+      if (!data.recipes || data.recipes.length === 0) {
+        console.warn("No new recipes fetched!")
+        throw new Error("No recipes found.")
+      }
+
+      totalRecipesFetched += data.recipes.length
+      console.log("Total recipes fetched today:", totalRecipesFetched)
+
+      recipes = formatRecipes(data.recipes) // Add new recipes
+      saveRecipesToLocalStorage() // Save the recipes in localStorage
       filteredRecipes = [...recipes] // Update the filtered recipes
       updatePaginatedRecipes()
-      return recipes
     })
     .catch((error) => {
       handleErrorMessages(error)
