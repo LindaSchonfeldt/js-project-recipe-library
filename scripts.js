@@ -171,9 +171,7 @@ const fetchRecipes = () => {
           servings: recipe.servings,
           sourceUrl: recipe.sourceUrl,
           diets: Array.isArray(recipe.diets) ? recipe.diets : [],
-          cuisine: Array.isArray(recipe.cuisines)
-            ? recipe.cuisines[0]
-            : "Unknown",
+          cuisines: Array.isArray(recipe.cuisines) ? recipe.cuisines : [],
           ingredients: Array.isArray(recipe.extendedIngredients)
             ? recipe.extendedIngredients.map(
                 (ingredient) => ingredient.original
@@ -293,7 +291,7 @@ const fetchNewRecipes = () => {
       totalRecipesFetched += data.recipes.length
 
       // Filter out possible undefined objects
-      let validRecipes = data.recipes
+      let newRecipes = data.recipes
         .filter((recipe) => recipe !== undefined)
         .map((recipe) => {
           return {
@@ -316,7 +314,8 @@ const fetchNewRecipes = () => {
           }
         })
 
-      recipes = formatRecipes(validRecipes) // Add new recipes
+      recipes = [...recipes, ...newRecipes] // Add new recipes to the array.
+      recipes = formatRecipes(recipes) // Format new recipes
       saveRecipesToLocalStorage() // Save the recipes in localStorage
       filteredRecipes = [...recipes] // Update the filtered recipes
       updatePaginatedRecipes()
