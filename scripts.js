@@ -83,7 +83,6 @@ const matchCuisineCategory = (cuisines) => {
 const formatRecipes = (recipes) => {
   console.log("Formatting recipes...")
   return recipes.map((recipe) => {
-    console.log("Recipe cuisines:", recipe.cuisines)
     let cuisineCategory = matchCuisineCategory(recipe.cuisines)
 
     return {
@@ -95,9 +94,6 @@ const formatRecipes = (recipes) => {
         : [],
       diets: Array.isArray(recipe.diets)
         ? recipe.diets.map((diet) => capitalizeWords(diet))
-        : [],
-      ingredients: Array.isArray(recipe.ingredients)
-        ? recipe.ingredients.map((ingredient) => capitalizeWords(ingredient))
         : []
     }
   })
@@ -147,9 +143,8 @@ const handleErrorMessages = (error) => {
 
 const fetchRecipes = () => {
   // Fetch recipes from the Spoonacular API
-  fetch(URL, { mode: "cors" })
+  fetch(URL)
     .then((response) => {
-      console.log("Response from API:", response) // Debug: Log the response
       // Throw extra error to find what's wrong in the case that something is
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -157,8 +152,6 @@ const fetchRecipes = () => {
       return response.json() // Convert the response to JSON
     })
     .then((data) => {
-      console.log("Raw API response:", data) // Console log exactly what the API returns
-
       // If the API answers with "failure" and the code 402
       if (data.status === "failure" && data.code === 402) {
         throw data
@@ -166,11 +159,9 @@ const fetchRecipes = () => {
 
       // Keep track of the number of fetched recipes
       totalRecipesFetched += data.recipes.length // Update the counter
-      console.log("Total recipes fetched today:", totalRecipesFetched) // Check the value
 
       // Store the fetched recipes in the recipes array
       recipes = data.recipes.map((recipe) => {
-        console.log("Cuisine data:", recipe.cuisines)
         return {
           id: recipe.id,
           title: recipe.title,
@@ -190,6 +181,7 @@ const fetchRecipes = () => {
             : []
         }
       })
+
       console.log("Fetched recipes from API:", recipes) // Debug: Log the fetched recipes
       saveRecipesToLocalStorage() // Save the recipes in localStorage
       recipes = formatRecipes(recipes) // Format the recipes
@@ -212,6 +204,7 @@ const loadRecipesFromLocalStorage = () => {
   }
   recipes = JSON.parse(storedRecipes)
   console.log("Loading recipes from localStorage:", recipes)
+  recipes = formatRecipes(recipes)
   filteredRecipes = [...recipes]
   updatePaginatedRecipes()
 }
@@ -287,8 +280,6 @@ const fetchNewRecipes = () => {
   fetch(URL)
     .then((response) => response.json())
     .then((data) => {
-      console.log("Fetched data:", data) // Debug: Log the API's answer
-
       // If the API answers with "failure" and the code 402
       if (data.status === "failure" && data.code === 402) {
         throw data
@@ -300,9 +291,32 @@ const fetchNewRecipes = () => {
       }
 
       totalRecipesFetched += data.recipes.length
-      console.log("Total recipes fetched today:", totalRecipesFetched)
 
-      recipes = formatRecipes(data.recipes) // Add new recipes
+      // Filter out possible undefined objects
+      let validRecipes = data.recipes
+        .filter((recipe) => recipe !== undefined)
+        .map((recipe) => {
+          return {
+            id: recipe.id,
+            title: recipe.title,
+            image: recipe.image,
+            dishTypes: Array.isArray(recipe.dishTypes) ? recipe.dishTypes : [],
+            readyInMinutes: recipe.readyInMinutes,
+            servings: recipe.servings,
+            sourceUrl: recipe.sourceUrl,
+            diets: Array.isArray(recipe.diets) ? recipe.diets : [],
+            cuisine: Array.isArray(recipe.cuisines)
+              ? recipe.cuisines[0]
+              : "Unknown",
+            ingredients: Array.isArray(recipe.extendedIngredients)
+              ? recipe.extendedIngredients.map(
+                  (ingredient) => ingredient.original
+                )
+              : []
+          }
+        })
+
+      recipes = formatRecipes(validRecipes) // Add new recipes
       saveRecipesToLocalStorage() // Save the recipes in localStorage
       filteredRecipes = [...recipes] // Update the filtered recipes
       updatePaginatedRecipes()
