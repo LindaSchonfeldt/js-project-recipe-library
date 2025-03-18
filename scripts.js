@@ -108,9 +108,7 @@ const handleErrorMessages = (error) => {
   if (typeof error === "object" && error !== null) {
     if (error.status === "failure" && error.code === 402) {
       console.log("API Quota exceeded - 402 detected in API response.")
-      message =
-        error.message ||
-        "API Quota exhausted! You have reached the daily limit."
+      message = "API Quota exhausted! You have reached the daily limit."
       messageType = "error"
     }
   } else if (
@@ -135,6 +133,7 @@ const handleErrorMessages = (error) => {
   // Update the message in the HTML
   const errorContainer = document.getElementById("error-container")
   if (errorContainer) {
+    recipeGrid.innerHTML = ""
     errorContainer.innerHTML = `<h3>${message}</h3>`
     errorContainer.className = messageType
     errorContainer.style.display = "block"
