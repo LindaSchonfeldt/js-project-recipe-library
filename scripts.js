@@ -133,7 +133,8 @@ const handleErrorMessages = (error) => {
   // Update the message in the HTML
   const errorContainer = document.getElementById("error-container")
   if (errorContainer) {
-    recipeGrid.innerHTML = ""
+    // Clear recipeGrid when displaying the error message
+    elements.recipeGrid.innerHTML = ""
     errorContainer.innerHTML = `<h3>${message}</h3>`
     errorContainer.className = messageType
     errorContainer.style.display = "block"

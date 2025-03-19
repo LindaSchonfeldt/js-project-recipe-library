@@ -235,7 +235,7 @@ li {
 
 #error-container {
   display: none; /* Hide by default */
-  text-align: center;
+  background: #ffecec;
   padding: 1.5rem;
   border-radius: 8px;
   margin: 1rem 0;
@@ -245,14 +245,12 @@ li {
 
 /* Error messages (red) */
 .error {
-  background: #ffecec;
   color: red;
   border: 2px solid red;
 }
 
 /* Warnings (yellow/orange) */
 .warning {
-  background: #fff3cd;
   color: darkorange;
   border: 2px solid orange;
 }
