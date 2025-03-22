@@ -3,8 +3,8 @@ To do:
 [x] Fetch real recipe data from Spoonacular's recipes/random endpoint
 [x] Display dynamic recipe cards based on the API data
 [x] Adapt filtering & sorting to match the API response format
-[] Show a useful message to the user in case the daily quota has been reached
-[] Show a loading state while fetching data
+[x] Show a useful message to the user in case the daily quota has been reached
+[x] Show a loading state while fetching data
 
 Stretch goals:
 [x] Connect the filter options to the recipe cards
@@ -16,17 +16,3 @@ Stretch goals:
 Bonuses:
 [] Change the diet dropdown to multi select tick boxes
 [] Move the eventlisteners for the select-box and option to the script-file
-
-Error message for API quota:
-
-Fetched data:
-Object { status: "failure", code: 402, message: "Your daily points limit of 150 has been reached. Please upgrade your plan to continue using the API." }
-​
-code: 402
-​
-message: "Your daily points limit of 150 has been reached. Please upgrade your plan to continue using the API."
-​
-status: "failure"
-​
-<prototype>: Object { … }
-scripts.js:292:15
