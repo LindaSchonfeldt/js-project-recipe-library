@@ -112,6 +112,13 @@ const handleErrorMessages = (error) => {
       messageType = "error"
     }
   } else if (
+    typeof error === "string" &&
+    error.toLowerCase().includes("networkerror")
+  ) {
+    console.log("Network error detected!")
+    message = "No internet connection. Please check your network."
+    messageType = "error"
+  } else if (
     error instanceof DOMException &&
     error.name === "QuotaExceededError"
   ) {
@@ -712,6 +719,9 @@ const initializeEventListeners = () => {
 
 // INITIALIZE PAGE
 document.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener("offline", () => {
+    handleErrorMessages()
+  })
   loadingMessage()
 
   setTimeout(() => {
