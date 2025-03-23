@@ -124,13 +124,6 @@ const handleErrorMessages = (error) => {
     console.log("LocalStorage quota exceeded!")
     message = "LocalStorage is full! Please clear some space."
     messageType = "error"
-  } else if (
-    typeof error === "string" &&
-    error.toLowerCase().includes("quota")
-  ) {
-    console.log("API Quota exhausted!")
-    message = "API Quota exhausted! You have reached the daily limit."
-    messageType = "error"
   } else {
     console.error("Error fetching data:", error)
     message = "Failed to load recipes. Please try again later."

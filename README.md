@@ -39,8 +39,8 @@ https://api.spoonacular.com/recipes/random?apiKey=YOUR_KEY_HERE&number=100
 
 ## 🙌 Credits
 
-This project was built as part of a JavaScript education program to practice working with APIs, DOM manipulation, localStorage, and responsive design.
-The design and idea is credited to the school Technigo.io.
+This project was created as part of a JavaScript education program to practice working with APIs, DOM manipulation, localStorage, and responsive design.
+The concept and design were originally provided by the school Technigo.io.
 
 ## 🌐 Live site
 
