@@ -247,7 +247,7 @@ const createListOfIngredients = (recipe) => {
 
 const noRecipesToDisplay = () => {
   if (!filteredRecipes || filteredRecipes.length === 0) {
-    elements.recipeGrid.innerHTML = `<p>No recipes found.</p>`
+    elements.recipeGrid.innerHTML = `<h3>Oops! We couldn't find any recipes. Try changing the filters or search terms.</h3>`
     return
   }
 }

@@ -15,4 +15,4 @@ Stretch goals:
 
 Bonuses:
 [] Change the diet dropdown to multi select tick boxes
-[] Move the eventlisteners for the select-box and option to the script-file
+[x] Move the eventlisteners for the select-box and option to the script-file

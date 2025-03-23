@@ -57,6 +57,12 @@ h2 {
   margin: 0 0 0.5rem 0;
 }
 
+h3 {
+  color: #0018a4;
+  font-size: 16px;
+  margin: 0.5 0 0.5rem 0;
+}
+
 .loading-message {
   font-size: 2rem;
   color: #0018a4;
