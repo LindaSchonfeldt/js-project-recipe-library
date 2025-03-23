@@ -54,7 +54,7 @@ const cuisineCategories = {
   Oceanian: ["Australian", "Polynesian"]
 }
 
-// FUNCTIONS
+//// FUNCTIONS ////
 
 const loadingMessage = () => {
   elements.recipeGrid.innerHTML = `<h3 class="loading-message">Loading recipes...</h3>`
@@ -81,7 +81,6 @@ const matchCuisineCategory = (cuisines) => {
 }
 
 const formatRecipes = (recipes) => {
-  console.log("Formatting recipes...")
   return recipes.map((recipe) => {
     let cuisineCategory = matchCuisineCategory(recipe.cuisines)
 
@@ -203,7 +202,6 @@ const loadRecipesFromLocalStorage = () => {
   const storedRecipes = localStorage.getItem("recipes")
   // If there are no recipes saved locally
   if (!storedRecipes) {
-    console.log("Fetching recipes...")
     fetchRecipes()
     return
   }
@@ -595,10 +593,12 @@ const sortRecipes = (order) => {
   let sortedRecipes = [...filteredRecipes]
 
   if (order === "Sort by time") {
+    // Shortest time first
     sortedRecipes.sort(
       (a, b) => (a.readyInMinutes || 0) - (b.readyInMinutes || 0)
     )
   } else if (order === "Sort by popularity") {
+    // Most popular recipe first
     sortedRecipes.sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
   }
 
@@ -623,7 +623,7 @@ const resetFilters = () => {
   // Update the UI after a short delay
   setTimeout(() => {
     filterRecipes()
-  }, 10)
+  }, 10) // 1 sec
 
   // Close open dropdowns
   document.querySelectorAll(".custom-select").forEach((select) => {
@@ -717,7 +717,7 @@ const initializeEventListeners = () => {
   })
 }
 
-// INITIALIZE PAGE
+// Initialize page
 document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("offline", () => {
     handleErrorMessages()
