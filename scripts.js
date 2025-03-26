@@ -363,7 +363,7 @@ const searchRecipes = () => {
   updatePaginatedRecipes()
 }
 
-function toggleDropdown(event) {
+const toggleDropdown = (event) => {
   event.stopPropagation() // Prevent the dropdown from closing when clicking on the dropdown itself
 
   // Find the closest .custom-select for the clicked element
@@ -380,7 +380,7 @@ function toggleDropdown(event) {
   dropdown.classList.toggle("active")
 }
 
-const selectedOption = (event) => {
+const selectOption = (event) => {
   // Get the selected option
   const option = event.currentTarget
 
@@ -408,7 +408,7 @@ const selectedOption = (event) => {
   console.log("Filter type: ", dropdown.dataset.filterType)
 }
 
-const timeFilter = (recipe) => {
+const filterOnTime = (recipe) => {
   //Assume it is true at first
   let timeMatch = true
   const timeFilter = document
@@ -430,7 +430,7 @@ const timeFilter = (recipe) => {
   return timeMatch
 }
 
-const ingredientFilter = (recipe) => {
+const filterOnIngredients = (recipe) => {
   let ingredientMatch = true
 
   const ingredientFilter = document
@@ -454,7 +454,7 @@ const ingredientFilter = (recipe) => {
   return ingredientMatch
 }
 
-const dishTypeFilter = (recipe) => {
+const filterOnDishType = (recipe) => {
   let dishTypeMatch = true
 
   const dishTypeFilter = document
@@ -469,7 +469,7 @@ const dishTypeFilter = (recipe) => {
   return dishTypeMatch
 }
 
-const cuisineFilter = (recipe) => {
+const filterOnCuisine = (recipe) => {
   let cuisineMatch = true
 
   const cuisineFilter = document
@@ -484,7 +484,7 @@ const cuisineFilter = (recipe) => {
   return cuisineMatch
 }
 
-const dietFilter = (recipe) => {
+const filterOnDiet = (recipe) => {
   let dietMatch = true
 
   const dietFilter = document
@@ -513,11 +513,11 @@ const filterRecipes = () => {
 
   // Filter the recipes
   filteredRecipes = recipes.filter((recipe) => {
-    const timeMatch = timeFilter(recipe)
-    const ingredientMatch = ingredientFilter(recipe)
-    const dishTypeMatch = dishTypeFilter(recipe)
-    const cuisineMatch = cuisineFilter(recipe)
-    const dietMatch = dietFilter(recipe)
+    const timeMatch = filterOnTime(recipe)
+    const ingredientMatch = filterOnIngredients(recipe)
+    const dishTypeMatch = filterOnDishType(recipe)
+    const cuisineMatch = filterOnCuisine(recipe)
+    const dietMatch = filterOnDiet(recipe)
 
     return (
       timeMatch && ingredientMatch && dishTypeMatch && cuisineMatch && dietMatch
@@ -703,9 +703,9 @@ const initializeEventListeners = () => {
     if (parentType === "diet") {
       option.addEventListener("click", toggleDiet)
     } else if (parentType === "sort") {
-      option.addEventListener("click", selectedOption)
+      option.addEventListener("click", selectOption)
     } else {
-      option.addEventListener("click", selectedOption)
+      option.addEventListener("click", selectOption)
     }
   })
 }
